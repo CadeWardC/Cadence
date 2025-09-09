@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Homepage</title>
+    <title>Lab</title>
     <style>
         * {
             margin: 0;
@@ -425,10 +425,10 @@
 <body>
     <header>
         <nav class="container">
-            <a href="#" class="logo">Your<span>Site</span></a>
+            <a href="#" class="logo">My<span>Lab</span></a>
             <ul class="nav-links">
                 <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#features">Features</a></li>
+                <li><a href="#research">Research</a></li>
                 <li><a href="#team">Team</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -438,16 +438,16 @@
     <section id="home" class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>Welcome to <span class="highlight">YourSite</span></h1>
-                <p>Discover our innovative solutions designed to help your business grow and succeed in today's competitive market with cutting-edge technology and expert support.</p>
+                <h1 id="hero-title"></h1>
+                <p id="hero-subtitle"></p>
             </div>
         </div>
     </section>
 
-    <section id="features" class="container content-section">
-        <h2 class="section-title">Our <span class="accent">Features</span></h2>
-        <div id="features-container" class="features-grid">
-            <div class="loading">Loading features...</div>
+    <section id="research" class="container content-section">
+        <h2 class="section-title">Our <span class="accent">Research Projects</span></h2>
+        <div id="research-container" class="features-grid">
+            <div class="loading">Loading research projects...</div>
         </div>
     </section>
 
@@ -467,111 +467,10 @@
     </footer>
 
     <script>
-        async function loadFeatures() {
+        async function loadHeroContent() {
             try {
-                const response = await fetch('./data/features.json');
-                if (!response.ok) throw new Error('Failed to load features');
+                const response = await fetch('./data/hero.json');
+                if (!response.ok) throw new Error('Failed to load hero content');
                 
-                const features = await response.json();
-                const container = document.getElementById('features-container');
-                
-                container.innerHTML = features.map(feature => `
-                    <div class="feature-card">
-                        <span class="feature-icon">${feature.icon}</span>
-                        <h3>${feature.title}</h3>
-                        <p>${feature.description}</p>
-                    </div>
-                `).join('');
-
-            } catch (error) {
-                console.error('Error loading features:', error);
-                document.getElementById('features-container').innerHTML = `
-                    <div class="error">
-                        Failed to load features. Please check that data/features.json exists.
-                    </div>
-                `;
-            }
-        }
-
-        async function loadTeam() {
-            try {
-                const response = await fetch('./data/team.json');
-                if (!response.ok) throw new Error('Failed to load team');
-                
-                const team = await response.json();
-                const container = document.getElementById('team-container');
-                
-                container.innerHTML = team.map(member => {
-                    let avatarContent;
-                    if (member.image) {
-                        avatarContent = `<img src="./images/team/${member.image}" alt="${member.name}" onerror="this.parentElement.innerHTML='${member.initials}'; this.parentElement.classList.add('no-image');">`;
-                    } else {
-                        avatarContent = member.initials;
-                    }
-                    
-                    return `
-                        <div class="team-member">
-                            <div class="team-avatar ${!member.image ? 'no-image' : ''}">${avatarContent}</div>
-                            <h4>${member.name}</h4>
-                            <div class="role">${member.role}</div>
-                            <p>${member.bio}</p>
-                        </div>
-                    `;
-                }).join('');
-
-            } catch (error) {
-                console.error('Error loading team:', error);
-                document.getElementById('team-container').innerHTML = `
-                    <div class="error">
-                        Failed to load team. Please check that data/team.json exists.
-                    </div>
-                `;
-            }
-        }
-
-        // Smooth scrolling and active link highlighting
-        document.addEventListener('DOMContentLoaded', () => {
-            const navLinks = document.querySelectorAll('.nav-links a');
-            const sections = document.querySelectorAll('section[id]');
-
-            function changeActiveLink() {
-                let index = sections.length;
-
-                while(--index && window.scrollY + 50 < sections[index].offsetTop) {}
-
-                navLinks.forEach((link) => link.classList.remove('active'));
-                if (navLinks[index]) {
-                    navLinks[index].classList.add('active');
-                }
-            }
-
-            changeActiveLink();
-            window.addEventListener('scroll', changeActiveLink);
-
-            navLinks.forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        });
-
-        // Load content
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadFeatures();
-            await loadTeam();
-            
-            // Fade in content sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.add('loaded');
-            });
-        });
-    </script>
-</body>
-</html>
+                const content = await response.json();
+                document.getElementById('hero-title').innerHTML = `${content.title} <span class="highlight">${content.highlight}</span>`;
