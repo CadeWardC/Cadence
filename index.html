@@ -201,10 +201,18 @@
         }
 
         .feature-icon {
-            font-size: 3rem;
+            height: 64px; /* Set a fixed height for the icon container */
             margin-bottom: 1.5rem;
             display: block;
             filter: grayscale(0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feature-icon img {
+            max-height: 100%;
+            max-width: 100%;
         }
 
         .feature-card h3 {
@@ -493,7 +501,9 @@
                 
                 container.innerHTML = projects.map(project => `
                     <div class="feature-card">
-                        <span class="feature-icon">${project.icon}</span>
+                        <div class="feature-icon">
+                            <img src="./images/research/${project.image}" alt="${project.title} icon">
+                        </div>
                         <h3>${project.title}</h3>
                         <p>${project.description}</p>
                     </div>
