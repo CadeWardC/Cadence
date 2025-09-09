@@ -5,5 +5,12 @@
     "initials": "MW", 
     "image": "Mike_Wazowski.png",
     "bio": "Great Scary Green Monster of Business"
+  },
+  {
+    "name": "James P. Sullivan",
+    "role": "Undergrad Student",
+    "initials": "Sully", 
+    "image": "",
+    "bio": "Big Friendly Furry Monster of Computer Science"
   }
 ]
