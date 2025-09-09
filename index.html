@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Homepage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: #FFFFFF;
+            border-bottom: 3px solid #FDB719;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            min-height: 70px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #FDB719;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 5px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #FDB719;
+            border-radius: 2px;
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #000000;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #FFFFFF;
+            padding: 4rem 0 5rem 0;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #000000;
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .hero-content .highlight {
+            color: #FDB719;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 0;
+            color: #555555;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        /* Sections */
+        section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 3.5rem;
+            color: #000000;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .section-title .accent {
+            color: #FDB719;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: #FDB719;
+            border-radius: 2px;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: #FFFFFF;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #FDB719;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #FDB719;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(253, 183, 25, 0.15);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            filter: grayscale(0.2);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #666666;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .team-member {
+            background: #FFFFFF;
+            border: 1px solid #e8e8e8;
+            border-radius: 15px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #FDB719;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            border-color: #FDB719;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(253, 183, 25, 0.15);
+        }
+
+        .team-member:hover::before {
+            transform: scaleX(1);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #000000;
+            font-weight: bold;
+            border: 4px solid #FDB719;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .team-avatar.no-image {
+            background: #FDB719;
+        }
+
+        .team-member h4 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .team-member .role {
+            font-size: 1rem;
+            color: #FDB719;
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .team-member p {
+            font-size: 0.95rem;
+            color: #666666;
+            line-height: 1.6;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666666;
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #FDB719;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error States */
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #d32f2f;
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* Alternating Section Backgrounds */
+        .alt-bg {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: #FFFFFF;
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 4px solid #FDB719;
+        }
+
+        .footer-content p {
+            color: #FFFFFF;
+            font-size: 1.1rem;
+        }
+
+        .footer-content .highlight {
+            color: #FDB719;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .features-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .team-avatar {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Content loading animation */
+        .content-section {
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        .content-section.loaded {
+            opacity: 1;
+        }
+
+        /* Subtle hover animations */
+        .feature-card,
+        .team-member {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">Your<span>Site</span></a>
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Welcome to <span class="highlight">YourSite</span></h1>
+                <p>Discover our innovative solutions designed to help your business grow and succeed in today's competitive market with cutting-edge technology and expert support.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="container content-section">
+        <h2 class="section-title">Our <span class="accent">Features</span></h2>
+        <div id="features-container" class="features-grid">
+            <div class="loading">Loading features...</div>
+        </div>
+    </section>
+
+    <section id="team" class="container content-section alt-bg">
+        <h2 class="section-title">Meet Our <span class="accent">Team</span></h2>
+        <div id="team-container" class="team-grid">
+            <div class="loading">Loading team members...</div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 <span class="highlight">YourSite</span>. Powered by dynamic content.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function loadFeatures() {
+            try {
+                const response = await fetch('./data/features.json');
+                if (!response.ok) throw new Error('Failed to load features');
+                
+                const features = await response.json();
+                const container = document.getElementById('features-container');
+                
+                container.innerHTML = features.map(feature => `
+                    <div class="feature-card">
+                        <span class="feature-icon">${feature.icon}</span>
+                        <h3>${feature.title}</h3>
+                        <p>${feature.description}</p>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading features:', error);
+                document.getElementById('features-container').innerHTML = `
+                    <div class="error">
+                        Failed to load features. Please check that data/features.json exists.
+                    </div>
+                `;
+            }
+        }
+
+        async function loadTeam() {
+            try {
+                const response = await fetch('./data/team.json');
+                if (!response.ok) throw new Error('Failed to load team');
+                
+                const team = await response.json();
+                const container = document.getElementById('team-container');
+                
+                container.innerHTML = team.map(member => {
+                    let avatarContent;
+                    if (member.image) {
+                        avatarContent = `<img src="./images/team/${member.image}" alt="${member.name}" onerror="this.parentElement.innerHTML='${member.initials}'; this.parentElement.classList.add('no-image');">`;
+                    } else {
+                        avatarContent = member.initials;
+                    }
+                    
+                    return `
+                        <div class="team-member">
+                            <div class="team-avatar ${!member.image ? 'no-image' : ''}">${avatarContent}</div>
+                            <h4>${member.name}</h4>
+                            <div class="role">${member.role}</div>
+                            <p>${member.bio}</p>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading team:', error);
+                document.getElementById('team-container').innerHTML = `
+                    <div class="error">
+                        Failed to load team. Please check that data/team.json exists.
+                    </div>
+                `;
+            }
+        }
+
+        // Smooth scrolling and active link highlighting
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const sections = document.querySelectorAll('section[id]');
+
+            function changeActiveLink() {
+                let index = sections.length;
+
+                while(--index && window.scrollY + 50 < sections[index].offsetTop) {}
+
+                navLinks.forEach((link) => link.classList.remove('active'));
+                if (navLinks[index]) {
+                    navLinks[index].classList.add('active');
+                }
+            }
+
+            changeActiveLink();
+            window.addEventListener('scroll', changeActiveLink);
+
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Load content
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadFeatures();
+            await loadTeam();
+            
+            // Fade in content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('loaded');
+            });
+        });
+    </script>
+</body>
+</html>
