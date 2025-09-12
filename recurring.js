@@ -101,25 +101,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // --- Drag and Drop Logic ---
-    
-    // Function to handle the drop logic, used by both mouse and touch events
     function handleDrop(zone, item) {
-        if (!item) return;
+        if (!item || !zone) return;
 
         const isMyTaskTemplate = item.parentElement.id === 'my-tasks-list';
         const isSuggestedTemplate = item.parentElement.id === 'suggested-tasks-list';
 
         if (zone.id === 'template-trash') {
-            if (isMyTaskTemplate) { // Only allow deleting "My Tasks" templates
+            if (isMyTaskTemplate) {
                 item.remove();
             }
         } else if (isMyTaskTemplate || isSuggestedTemplate) {
-            // Clone templates instead of moving them
             const taskText = item.querySelector('span').textContent;
             const clonedTask = createNewTask(taskText, false);
             zone.appendChild(clonedTask);
         } else {
-            // Move existing tasks within the schedule
             zone.appendChild(item);
         }
         saveState();
@@ -137,45 +133,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Touch-based Drag Listeners (for Mobile)
+    // 2. NEW Touch-based Drag Listeners (for Mobile)
     function addTouchListeners(task) {
         let touchClone = null;
         let lastDropzone = null;
+        let dropzoneRects = [];
+        let longPressTimer = null;
+        let isDragging = false;
+
+        const longPressDuration = 200; // ms
 
         task.addEventListener('touchstart', e => {
             draggedItem = e.currentTarget;
             
-            // Create a visual clone of the item for dragging feedback
-            touchClone = draggedItem.cloneNode(true);
-            touchClone.style.position = 'absolute';
-            touchClone.style.opacity = '0.8';
-            touchClone.style.pointerEvents = 'none'; // So it doesn't block underlying elements
-            touchClone.style.zIndex = '1000';
-            document.body.appendChild(touchClone);
+            // Start a timer for long press
+            longPressTimer = setTimeout(() => {
+                isDragging = true;
+                
+                // Get fresh positions of all dropzones
+                dropzoneRects = Array.from(dropzones).map(zone => ({
+                    element: zone,
+                    rect: zone.getBoundingClientRect()
+                }));
 
-            // Position the clone
-            const touch = e.touches[0];
-            touchClone.style.left = touch.pageX - touchClone.offsetWidth / 2 + 'px';
-            touchClone.style.top = touch.pageY - touchClone.offsetHeight / 2 + 'px';
-            
-            draggedItem.classList.add('dragging'); // Make original item transparent
-        }, { passive: true });
+                // Create and position the visual clone
+                touchClone = draggedItem.cloneNode(true);
+                touchClone.style.position = 'fixed'; // Use fixed for viewport positioning
+                touchClone.style.opacity = '0.8';
+                touchClone.style.pointerEvents = 'none';
+                touchClone.style.zIndex = '1000';
+                document.body.appendChild(touchClone);
+
+                const touch = e.touches[0];
+                touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
+                touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
+
+                draggedItem.classList.add('dragging');
+            }, longPressDuration);
+        });
 
         task.addEventListener('touchmove', e => {
-            if (!touchClone) return;
-            e.preventDefault(); // Prevent screen from scrolling while dragging
+            if (!isDragging || !touchClone) return;
+            e.preventDefault(); // Prevent scrolling WHILE dragging
 
             const touch = e.touches[0];
-            // Move the clone with the finger
-            touchClone.style.left = touch.pageX - touchClone.offsetWidth / 2 + 'px';
-            touchClone.style.top = touch.pageY - touchClone.offsetHeight / 2 + 'px';
+            touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
+            touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
             
-            // Detect dropzone under the finger
-            touchClone.style.visibility = 'hidden';
-            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-            touchClone.style.visibility = 'visible';
-
-            const currentDropzone = elementBelow ? elementBelow.closest('.dropzone') : null;
+            let currentDropzone = null;
+            // Find dropzone by coordinates instead of elementFromPoint
+            for (const item of dropzoneRects) {
+                const rect = item.rect;
+                if (touch.clientX > rect.left && touch.clientX < rect.right &&
+                    touch.clientY > rect.top && touch.clientY < rect.bottom) {
+                    currentDropzone = item.element;
+                    break;
+                }
+            }
 
             if (lastDropzone && lastDropzone !== currentDropzone) {
                 lastDropzone.classList.remove('dragover');
@@ -186,21 +200,27 @@ document.addEventListener('DOMContentLoaded', () => {
             lastDropzone = currentDropzone;
         });
 
-        task.addEventListener('touchend', e => {
-            if (!touchClone) return;
+        const endTouch = () => {
+            clearTimeout(longPressTimer); // Cancel long press if finger lifts early
+            if (!isDragging) return;
 
             if (lastDropzone) {
                 lastDropzone.classList.remove('dragover');
-                handleDrop(lastDropzone, draggedItem); // Use the shared drop handler
+                handleDrop(lastDropzone, draggedItem);
             }
             
-            // Cleanup
-            draggedItem.classList.remove('dragging');
-            document.body.removeChild(touchClone);
+            if (draggedItem) draggedItem.classList.remove('dragging');
+            if (touchClone) document.body.removeChild(touchClone);
+            
+            // Reset all state variables
             touchClone = null;
             draggedItem = null;
             lastDropzone = null;
-        });
+            isDragging = false;
+        };
+
+        task.addEventListener('touchend', endTouch);
+        task.addEventListener('touchcancel', endTouch);
     }
     
     // Add listeners to all dropzones
@@ -213,13 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
         zone.addEventListener('drop', e => {
             e.preventDefault();
             zone.classList.remove('dragover');
-            handleDrop(zone, draggedItem); // Use the shared drop handler
+            handleDrop(zone, draggedItem);
         });
     });
 
     // --- Initial Load ---
-    
-    // Initialize tasks that are hard-coded in the HTML
     document.querySelectorAll('#suggested-tasks-list .task').forEach(task => {
         const label = document.createElement('span');
         label.textContent = task.textContent.trim();
@@ -229,5 +247,5 @@ document.addEventListener('DOMContentLoaded', () => {
         addTouchListeners(task);
     });
 
-    loadState(); // Load all saved states when the page loads
+    loadState();
 });
