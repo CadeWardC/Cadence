@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="menu-btn">
+        <span></span>
+        <span></span>
+    </button>
+    <div class="overlay"></div>
+
+    <nav class="side-menu">
+        <a href="index.html" class="menu-item">Daily Tasks</a>
+        <a href="recurring.html" class="menu-item">Recurring Tasks</a>
+        <a href="calendar.html" class="menu-item">Calendar</a>
+        <a href="settings.html" class="menu-item">Settings</a>
+    </nav>
+
+    <div class="container">
+        <h1>Settings</h1>
+
+        <div class="settings-section">
+            <h2>Storage Method</h2>
+            <p>Choose where your data is saved. Cloud sync is coming soon.</p>
+            <select id="storage-select" class="styled-select">
+                <option value="local" selected>Local Storage</option>
+                <option value="dropbox">Dropbox</option>
+                <option value="database" disabled>Database (Coming Soon)</option>
+            </select>
+            <div id="dropbox-settings" class="settings-section hidden">
+                <h2>Dropbox Settings</h2>
+                <div id="dropbox-connection-status"></div>
+                <div id="dropbox-auth-steps">
+                    <!-- Step 1: Button to start the process -->
+                    <div id="dropbox-step-1">
+                        <p>Click the button below to open Dropbox and get your authorization code.</p>
+                        <button id="get-dropbox-code-btn">Get Dropbox Authorization Code</button>
+                    </div>
+                    <!-- Step 2: Field to paste the code -->
+                    <div id="dropbox-step-2" class="hidden">
+                        <p>Copy the code from the Dropbox page and paste it below.</p>
+                        <div id="dropbox-token-entry">
+                            <input type="text" id="dropbox-code-input" placeholder="Paste Authorization Code...">
+                            <button id="submit-dropbox-code-btn">Submit Code</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropbox-actions">
+                    <button id="save-to-dropbox-btn" class="action-btn" disabled>Save to Dropbox</button>
+                    <button id="load-from-dropbox-btn" class="action-btn" disabled>Load from Dropbox</button>
+                </div>
+                <div class="autosave-setting">
+                    <label for="autosave-interval-select">Autosave Interval:</label>
+                    <select id="autosave-interval-select" class="styled-select">
+                        <option value="0">None</option>
+                        <option value="300000">Every 5 minutes</option>
+                        <option value="600000">Every 10 minutes</option>
+                        <option value="900000">Every 15 minutes</option>
+                        <option value="1800000">Every 30 minutes</option>
+                    </select>
+                    <p id="autosave-status" class="setting-description"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Data Management</h2>
+            <p>Save a backup to a file, or restore your data from a backup file.</p>
+            <input type="file" id="import-file-input" class="hidden" accept=".td">
+            <button id="import-data-btn">Import from File</button>
+            <button id="export-data-btn">Export to File</button>
+        </div>
+
+        <div class="settings-section danger-zone">
+            <h2>Danger Zone</h2>
+            <p>This will permanently delete all your tasks, schedules, and settings.</p>
+            <button id="clear-data-btn" class="danger-btn">Clear All Data</button>
+        </div>
+    </div>
+
+    <!-- Autosave Notification Popup -->
+    <div id="autosave-popup"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div id="confirm-initial-view">
+                <h3>Are you sure?</h3>
+                <p>This action will permanently delete all your data and cannot be undone.</p>
+                <div class="modal-buttons">
+                    <button id="confirm-delete-btn" class="danger-btn">Yes, Delete Everything</button>
+                    <button id="cancel-delete-btn">Cancel</button>
+                </div>
+            </div>
+            <div id="confirm-success-view" class="hidden">
+                <h3>Success</h3>
+                <p>All data has been cleared. Redirecting...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="menu.js"></script>
+    <script src="autosave.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>
