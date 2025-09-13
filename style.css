@@ -1065,6 +1065,7 @@ li label {
     
     .task-input-row .time-input {
         width: 100%;
+        padding: 12px 10px; /* Ensure consistent padding */
     }
     
     .task-options-row {
@@ -1072,9 +1073,18 @@ li label {
         align-items: stretch;
         gap: 10px;
     }
+
+    .deadline-toggle-container {
+        flex-grow: 0; /* Prevent stretching */
+        justify-content: flex-start;
+    }
     
     .task-options-row button {
         width: 100%;
+    }
+
+    .calendar-container {
+        padding: 10px; /* Reduce padding on mobile */
     }
 
     .calendar-day {
