@@ -150,6 +150,21 @@ document.addEventListener('DOMContentLoaded', () => {
         task.addEventListener('touchmove', e => {
             if (!draggedItem) return;
 
+            // If more than one finger is on the screen, the user is likely trying to scroll or zoom.
+            // In this case, we cancel the drag and let the browser handle the gesture.
+            if (e.touches.length > 1) {
+                // If a drag was in progress, clean it up
+                if (clone) {
+                    document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('dragover'));
+                    document.body.removeChild(clone);
+                    clone = null;
+                    draggedItem.style.opacity = '1';
+                    draggedItem = null;
+                    isDragging = false;
+                }
+                return; // Allow native browser scrolling/zooming
+            }
+
             // Start dragging only if moved beyond a small threshold
             if (!isDragging) {
                 const moveX = Math.abs(e.touches[0].clientX - startX);
@@ -161,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // Once dragging starts, prevent scrolling
+            // Once a single-finger drag starts, prevent scrolling
             e.preventDefault();
 
             // Create clone only when dragging starts
