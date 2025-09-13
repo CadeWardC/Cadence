@@ -23,14 +23,12 @@
 }
 
 @keyframes fadeOut {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.9);
-    }
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+:root {
+    --accent-color: #4a90e2; /* Default accent color */
 }
 
 body {
@@ -119,8 +117,7 @@ li:last-child {
 }
 
 li:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    transform: none; /* Disable hover scale on mobile */
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 input[type="checkbox"] {
@@ -138,8 +135,8 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:checked {
-    background-color: #5B7C99;
-    border-color: #5B7C99;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 input[type="checkbox"]:checked::after {
@@ -179,15 +176,12 @@ input[type="password"]::placeholder {
 
 input[type="text"]:focus,
 input[type="password"]:focus {
-    outline: none;
-    border-color: #5B7C99;
-    box-shadow: 0 0 10px rgba(91, 124, 153, 0.5);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
 }
 
 button {
-    width: 100%;
-    padding: 12px;
-    background-color: #5B7C99;
+    background-color: var(--accent-color);
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -195,11 +189,12 @@ button {
     margin-top: 15px;
     font-size: 18px;
     font-weight: 500;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s, transform 0.2s, filter 0.3s;
 }
 
 button:hover {
-    background-color: #6c92b7;
+    filter: brightness(1.2);
+    transform: scale(1.05);
 }
 
 .danger-btn {
@@ -309,7 +304,7 @@ button:hover {
 }
 
 .menu-item:hover {
-    background-color: #5B7C99;
+    background-color: var(--accent-color);
     color: #fff;
 }
 
@@ -419,7 +414,7 @@ button:hover {
 
 .tab-btn.active {
     color: #fff;
-    border-bottom-color: #5B7C99;
+    border-bottom: 3px solid var(--accent-color);
 }
 
 .tab-panel {
@@ -507,7 +502,7 @@ button:hover {
 }
 
 #dropbox-settings a {
-    color: #6c92b7;
+    color: var(--accent-color);
     text-decoration: none;
 }
 
@@ -544,9 +539,10 @@ button:hover {
 }
 
 #copy-uri-btn {
-    margin: 0;
     padding: 5px 10px;
     font-size: 0.8em;
+    margin-left: 10px;
+    background-color: var(--accent-color);
 }
 
 #dropbox-token-entry {
@@ -598,9 +594,8 @@ button:hover {
 }
 
 .styled-select:focus {
-    outline: none;
-    border-color: #5B7C99;
-    box-shadow: 0 0 5px rgba(91, 124, 153, 0.5);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
 }
 
 .styled-select option {

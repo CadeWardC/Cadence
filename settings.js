@@ -22,6 +22,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const successView = document.getElementById('confirm-success-view');
     const autosaveIntervalSelect = document.getElementById('autosave-interval-select');
     const autosaveStatus = document.getElementById('autosave-status');
+    const accentColorPicker = document.getElementById('accent-color-picker');
+
+    // --- Accent Color Logic ---
+    function applyAccentColor(color) {
+        if (color) {
+            document.documentElement.style.setProperty('--accent-color', color);
+        }
+    }
+
+    accentColorPicker.addEventListener('input', (e) => {
+        applyAccentColor(e.target.value);
+    });
+
+    accentColorPicker.addEventListener('change', (e) => {
+        localStorage.setItem('accentColor', e.target.value);
+    });
 
     // --- Dropbox OAuth 2 PKCE Constants & Functions ---
     const DROPBOX_CLIENT_ID = 'jghzh4x67volsfv';
@@ -291,10 +307,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAutosaveAndStatus();
     });
 
+    // --- Initialization ---
     const savedMethod = localStorage.getItem('storageMethod') || 'local';
     storageSelect.value = savedMethod;
-    const savedInterval = localStorage.getItem('autosaveInterval') || '0';
+    const savedInterval = localStorage.getItem('autosaveInterval') || '300000'; // 5 minutes default
     autosaveIntervalSelect.value = savedInterval;
+    const savedColor = localStorage.getItem('accentColor');
+    if (savedColor) {
+        accentColorPicker.value = savedColor;
+        applyAccentColor(savedColor);
+    } else {
+        // Set default if nothing is saved
+        accentColorPicker.value = '#4a90e2';
+    }
+
     dropboxSettings.classList.toggle('hidden', savedMethod !== 'dropbox');
     updateDropboxUI();
     updateAutosaveStatus();
@@ -341,21 +367,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (exportDataBtn) {
         exportDataBtn.addEventListener('click', () => {
             const dataToExport = {};
+            const sensitiveKeys = ['dropboxAccessToken', 'dropboxRefreshToken', 'pkceCodeVerifier'];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                // FIX: Include all task types in the export
-                if (key.startsWith('recurringTasks') || key.startsWith('myTaskTemplates') || key.startsWith('dailyTasks') || key.startsWith('completedRecurring') || key.startsWith('calendarTasks-')) {
-                    try {
-                        dataToExport[key] = JSON.parse(localStorage.getItem(key));
-                    } catch (e) {
-                        dataToExport[key] = localStorage.getItem(key);
-                    }
+                if (!sensitiveKeys.includes(key)) {
+                    dataToExport[key] = localStorage.getItem(key);
                 }
-            }
-            // Ensure storageMethod is saved
-            const storageMethod = localStorage.getItem('storageMethod');
-            if (storageMethod) {
-                dataToExport.storageMethod = storageMethod;
             }
             
             const jsonString = JSON.stringify(dataToExport, null, 2);

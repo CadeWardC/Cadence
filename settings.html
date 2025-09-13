@@ -31,8 +31,17 @@
                 <option value="dropbox">Dropbox</option>
                 <option value="database" disabled>Database (Coming Soon)</option>
             </select>
-            <div id="dropbox-settings" class="settings-section hidden">
-                <h2>Dropbox Settings</h2>
+        </div>
+
+        <div class="settings-section">
+            <h2>Appearance</h2>
+            <label for="accent-color-picker">Accent Color:</label>
+            <input type="color" id="accent-color-picker">
+        </div>
+
+        <div id="dropbox-settings" class="hidden">
+            <div class="settings-section">
+                <h2>Dropbox Connection</h2>
                 <div id="dropbox-connection-status"></div>
                 <div id="dropbox-auth-steps">
                     <!-- Step 1: Button to start the process -->
