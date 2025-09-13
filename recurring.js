@@ -135,92 +135,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. NEW Touch-based Drag Listeners (for Mobile)
     function addTouchListeners(task) {
-        let touchClone = null;
-        let lastDropzone = null;
-        let dropzoneRects = [];
-        let longPressTimer = null;
-        let isDragging = false;
-
-        const longPressDuration = 200; // ms
+        let clone = null;
+        let startX, startY;
+        let isDragging = false; // Flag to track if dragging has started
 
         task.addEventListener('touchstart', e => {
             draggedItem = e.currentTarget;
-            
-            // Start a timer for long press
-            longPressTimer = setTimeout(() => {
-                isDragging = true;
-                
-                // Get fresh positions of all dropzones
-                dropzoneRects = Array.from(dropzones).map(zone => ({
-                    element: zone,
-                    rect: zone.getBoundingClientRect()
-                }));
-
-                // Create and position the visual clone
-                touchClone = draggedItem.cloneNode(true);
-                touchClone.style.position = 'fixed'; // Use fixed for viewport positioning
-                touchClone.style.opacity = '0.8';
-                touchClone.style.pointerEvents = 'none';
-                touchClone.style.zIndex = '1000';
-                document.body.appendChild(touchClone);
-
-                const touch = e.touches[0];
-                touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
-                touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
-
-                draggedItem.classList.add('dragging');
-            }, longPressDuration);
-        });
+            const rect = draggedItem.getBoundingClientRect();
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = false; // Reset flag on new touch
+        }, { passive: true }); // Keep touchstart passive for better scroll performance initially
 
         task.addEventListener('touchmove', e => {
-            if (!isDragging || !touchClone) return;
-            e.preventDefault(); // Prevent scrolling WHILE dragging
+            if (!draggedItem) return;
 
-            const touch = e.touches[0];
-            touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
-            touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
-            
-            let currentDropzone = null;
-            // Find dropzone by coordinates instead of elementFromPoint
-            for (const item of dropzoneRects) {
-                const rect = item.rect;
-                if (touch.clientX > rect.left && touch.clientX < rect.right &&
-                    touch.clientY > rect.top && touch.clientY < rect.bottom) {
-                    currentDropzone = item.element;
-                    break;
+            // Start dragging only if moved beyond a small threshold
+            if (!isDragging) {
+                const moveX = Math.abs(e.touches[0].clientX - startX);
+                const moveY = Math.abs(e.touches[0].clientY - startY);
+                if (moveX > 5 || moveY > 5) { // Threshold to prevent accidental drags
+                    isDragging = true;
+                } else {
+                    return; // Not a drag yet, allow scrolling
                 }
             }
+            
+            // Once dragging starts, prevent scrolling
+            e.preventDefault();
 
-            if (lastDropzone && lastDropzone !== currentDropzone) {
-                lastDropzone.classList.remove('dragover');
+            // Create clone only when dragging starts
+            if (!clone) {
+                const rect = draggedItem.getBoundingClientRect();
+                clone = draggedItem.cloneNode(true);
+                clone.style.position = 'fixed'; // Use fixed positioning for stability
+                clone.style.left = `${rect.left}px`;
+                clone.style.top = `${rect.top}px`;
+                clone.style.width = `${rect.width}px`;
+                clone.style.height = `${rect.height}px`;
+                clone.style.pointerEvents = 'none';
+                clone.style.opacity = '0.8';
+                clone.classList.add('dragging');
+                document.body.appendChild(clone);
+                draggedItem.style.opacity = '0.5';
             }
-            if (currentDropzone) {
-                currentDropzone.classList.add('dragover');
+
+            const touch = e.touches[0];
+            clone.style.left = `${touch.clientX - (clone.offsetWidth / 2)}px`;
+            clone.style.top = `${touch.clientY - (clone.offsetHeight / 2)}px`;
+
+            // Highlight dropzone
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropzone = elementUnder ? elementUnder.closest('.dropzone') : null;
+            
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                dz.classList.toggle('dragover', dz === dropzone);
+            });
+
+        }, { passive: false }); // This listener must be active to call preventDefault
+
+        task.addEventListener('touchend', e => {
+            if (!isDragging || !clone || !draggedItem) {
+                // If it wasn't a drag, just reset
+                draggedItem = null;
+                return;
             }
-            lastDropzone = currentDropzone;
-        });
 
-        const endTouch = () => {
-            clearTimeout(longPressTimer); // Cancel long press if finger lifts early
-            if (!isDragging) return;
+            const touch = e.changedTouches[0];
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropzone = elementUnder ? elementUnder.closest('.dropzone') : null;
 
-            if (lastDropzone) {
-                lastDropzone.classList.remove('dragover');
-                handleDrop(lastDropzone, draggedItem);
+            if (dropzone) {
+                handleDrop(dropzone, draggedItem);
             }
             
-            if (draggedItem) draggedItem.classList.remove('dragging');
-            if (touchClone) document.body.removeChild(touchClone);
+            document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('dragover'));
             
-            // Reset all state variables
-            touchClone = null;
+            document.body.removeChild(clone);
+            clone = null;
+            draggedItem.style.opacity = '1';
             draggedItem = null;
-            lastDropzone = null;
             isDragging = false;
-        };
-
-        task.addEventListener('touchend', endTouch);
-        task.addEventListener('touchcancel', endTouch);
+        });
     }
     
     // Add listeners to all dropzones
