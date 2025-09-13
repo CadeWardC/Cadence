@@ -941,15 +941,10 @@ li label {
 }
 
 .task-input-row .time-input {
-    background-color: #333;
-    border: 1px solid #555;
-    color: #f0f0f0;
-    border-radius: 5px;
-    padding: 12px 10px;
-    margin-top: 0;
-    width: 120px;
+    width: 100%;
+    padding: 15px 10px; /* Increased vertical padding */
 }
-
+    
 .task-options-row {
     display: flex;
     justify-content: space-between;
@@ -1065,7 +1060,7 @@ li label {
     
     .task-input-row .time-input {
         width: 100%;
-        padding: 12px 10px; /* Ensure consistent padding */
+        padding: 15px 10px; /* Increased vertical padding */
     }
     
     .task-options-row {
@@ -1078,6 +1073,7 @@ li label {
         flex-grow: 0; /* Prevent stretching */
         justify-content: flex-start;
         align-self: flex-start; /* Prevent the container from stretching */
+        width: auto; /* Ensure container only takes up content width */
     }
     
     .task-options-row button {
