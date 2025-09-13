@@ -2,7 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selectors ---
-    const dateDisplay = document.querySelector('h1');
+    const dayNameDisplay = document.getElementById('day-name-display');
+    const dateDisplay = document.getElementById('date-display');
     const recurringTasksList = document.getElementById('recurring-tasks');
     const deadlineTasksList = document.getElementById('deadline-tasks'); // MODIFICATION
     const dailyTasksList = document.getElementById('daily-tasks');
@@ -12,6 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Constants and Keys ---
     const today = new Date();
+    // const today = new Date('2025-09-13T12:00:00'); // For testing specific dates
+    
+    // --- Date Display ---
+    function updateDateDisplay() {
+        const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+        const dateString = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        dayNameDisplay.textContent = dayName;
+        dateDisplay.textContent = dateString;
+    }
+
+    // --- Task Data ---
+    let recurringTasks = {};
 
     // --- Helper Functions ---
     // This function is assumed to be in utils.js, but defined here for clarity.
@@ -222,10 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Load ---
     function initialize() {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        if(dateDisplay) {
-            dateDisplay.textContent = today.toLocaleDateString('en-US', options);
-        }
+        updateDateDisplay();
         renderRecurringTasks();
         renderDeadlineTasks(); // MODIFICATION
         renderDailyTasks();
