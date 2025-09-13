@@ -317,9 +317,9 @@ button:hover {
 
 /* --- Recurring Tasks Page Styles --- */
 #weekdays-container {
-    display: flex;
-    flex-direction: column; /* Single column for mobile */
-    gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
     margin-bottom: 30px;
 }
 
@@ -810,9 +810,8 @@ button:hover {
 
     /* Recurring page grid on desktop */
     #weekdays-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+        /* This is now the default, but we can make it wider on desktop if needed */
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 
     /* Add task layout on desktop */
