@@ -63,7 +63,7 @@ h1 {
     color: #ffffff;
     font-weight: 700;
     margin-bottom: 20px;
-    font-size: 2em;
+    font-size: 1.8em; /* Reduced for mobile */
 }
 
 .task-section {
@@ -73,10 +73,10 @@ h1 {
 h2 {
     color: #e0e0e0;
     border-bottom: 2px solid #5B7C99;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    padding-bottom: 8px; /* Reduced */
+    margin-bottom: 15px; /* Reduced */
     font-weight: 500;
-    font-size: 1.4em;
+    font-size: 1.2em; /* Reduced for mobile */
 }
 
 ul {
@@ -87,7 +87,7 @@ ul {
 li {
     display: flex;
     align-items: center;
-    padding: 15px 10px;
+    padding: 12px 8px; /* Reduced padding */
     border-bottom: 1px solid #444;
     transition: background-color 0.3s, transform 0.2s ease-out;
     animation: fadeIn 0.4s ease-out forwards;
@@ -104,7 +104,7 @@ li:last-child {
 
 li:hover {
     background-color: rgba(255, 255, 255, 0.05);
-    transform: scale(1.02);
+    transform: none; /* Disable hover scale on mobile */
 }
 
 input[type="checkbox"] {
@@ -139,7 +139,7 @@ input[type="checkbox"]:checked::after {
 label {
     flex-grow: 1;
     color: #f0f0f0;
-    font-size: 16px;
+    font-size: 15px; /* Slightly reduced */
     transition: color 0.3s;
 }
 
@@ -325,13 +325,16 @@ button:hover {
 
 .weekday-section {
     /* Flex properties are no longer needed with a grid layout */
+    display: flex;
+    flex-direction: column;
 }
 
 .task-list {
-    min-height: 100px;
+    min-height: 80px; /* Reduced min-height */
     background-color: rgba(0,0,0,0.1);
     border-radius: 8px;
-    padding: 8px;
+    padding: 6px; /* Reduced padding */
+    flex-grow: 1; /* Allow list to grow */
 }
 
 .task {
@@ -339,10 +342,11 @@ button:hover {
     align-items: center;
     background-color: transparent;
     color: #f0f0f0;
-    padding: 8px 10px;
+    padding: 6px 8px; /* Reduced padding */
     border-bottom: 1px solid #444;
     cursor: grab;
     transition: background-color 0.3s;
+    font-size: 0.9em; /* Reduced font size */
 }
 
 .task:last-child {
@@ -741,14 +745,21 @@ button:hover {
 .calendar-day {
     background-color: rgba(255, 255, 255, 0.05);
     border-radius: 5px;
-    height: 80px;
+    min-height: 60px; /* Reduced height */
+    padding: 4px; /* Add padding for tasks */
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Stack day number and tasks */
+    justify-content: flex-start; /* Align to top */
     align-items: center;
-    font-size: 1.1em;
+    font-size: 0.9em; /* Reduced font size */
     transition: background-color 0.3s;
     cursor: pointer;
     border: 2px solid transparent;
+    overflow: hidden; /* Hide overflowing tasks */
+}
+
+.calendar-day .day-number {
+    font-weight: 500;
 }
 
 .calendar-day:hover {
@@ -776,6 +787,30 @@ button:hover {
 .calendar-day.selected {
     border-color: #8cb3d9;
     background-color: rgba(91, 124, 153, 0.5);
+}
+
+.calendar .tasks-container {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.calendar .task {
+    font-size: 0.7em; /* Smaller font for calendar tasks */
+    padding: 1px 3px;
+    margin-top: 2px;
+    background-color: #3a3a3a;
+    border-radius: 3px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.calendar .task.deadline {
+    background-color: #5e2a2a;
+    font-weight: bold;
+    border-left: 2px solid #c94c4c;
 }
 
 #day-tasks-container {
@@ -806,6 +841,10 @@ button:hover {
     li {
         font-size: 1.1em;
         padding: 18px 10px;
+    }
+
+    li:hover {
+        transform: scale(1.02); /* Re-enable hover scale on desktop */
     }
 
     /* Recurring page grid on desktop */
@@ -1020,5 +1059,9 @@ li label {
     
     .task-options-row button {
         width: 100%;
+    }
+
+    .calendar-day {
+        height: auto; /* Allow height to adjust on mobile */
     }
 }
