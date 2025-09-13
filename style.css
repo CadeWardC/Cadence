@@ -1042,6 +1042,20 @@ li label {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    /* Make task template lists scroll horizontally on mobile */
+    #suggested-tasks-list,
+    #my-tasks-list {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 10px; /* Add space for the scrollbar */
+    }
+
+    #suggested-tasks-list .task,
+    #my-tasks-list .task {
+        flex: 0 0 110px; /* Give tasks a fixed width so they don't shrink */
+    }
+
     .task-input-row {
         flex-direction: column;
         gap: 8px;
