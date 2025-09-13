@@ -330,10 +330,10 @@ button:hover {
 }
 
 .task-list {
-    min-height: 80px; /* Reduced min-height */
+    min-height: 60px; /* Further reduced min-height */
     background-color: rgba(0,0,0,0.1);
     border-radius: 8px;
-    padding: 6px; /* Reduced padding */
+    padding: 4px; /* Further reduced padding */
     flex-grow: 1; /* Allow list to grow */
 }
 
@@ -342,11 +342,11 @@ button:hover {
     align-items: center;
     background-color: transparent;
     color: #f0f0f0;
-    padding: 6px 8px; /* Reduced padding */
+    padding: 5px 6px; /* Reduced padding */
     border-bottom: 1px solid #444;
     cursor: grab;
     transition: background-color 0.3s;
-    font-size: 0.9em; /* Reduced font size */
+    font-size: 0.85em; /* Further reduced font size */
 }
 
 .task:last-child {
@@ -416,23 +416,23 @@ button:hover {
 #suggested-tasks-list,
 #my-tasks-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-    padding: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Reduced min-width */
+    gap: 8px; /* Reduced gap */
+    padding: 8px; /* Reduced padding */
     background-color: rgba(0,0,0,0.1);
     border-radius: 8px;
-    min-height: 50px;
+    min-height: 40px; /* Reduced min-height */
 }
 
 #suggested-tasks-list .task,
 #my-tasks-list .task {
     background-color: #4a4a4a;
     border: none;
-    border-radius: 8px;
-    padding: 15px 10px;
+    border-radius: 6px; /* Reduced border-radius */
+    padding: 8px 6px; /* Reduced padding */
     text-align: center;
-    font-size: 0.9em;
-    min-height: 50px;
+    font-size: 0.8em; /* Reduced font size */
+    min-height: 40px; /* Reduced min-height */
     display: flex;
     justify-content: center;
     align-items: center;
