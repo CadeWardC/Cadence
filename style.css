@@ -1077,6 +1077,7 @@ li label {
     .deadline-toggle-container {
         flex-grow: 0; /* Prevent stretching */
         justify-content: flex-start;
+        align-self: flex-start; /* Prevent the container from stretching */
     }
     
     .task-options-row button {
