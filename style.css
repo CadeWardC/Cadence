@@ -86,7 +86,7 @@ h1 #date-display {
 
 h2 {
     color: #e0e0e0;
-    border-bottom: 2px solid #5B7C99;
+    border-bottom: 2px solid var(--accent-color); /* Use accent color */
     padding-bottom: 8px; /* Reduced */
     margin-bottom: 15px; /* Reduced */
     font-weight: 500;
@@ -190,11 +190,11 @@ button {
     margin-top: 15px;
     font-size: 18px;
     font-weight: 500;
-    transition: background-color 0.3s, transform 0.2s; /* Removed filter transition */
+    transition: background-color 0.3s, transform 0.2s, filter 0.3s; /* Added filter transition */
 }
 
 button:hover {
-    background-color: #6a8fb8; /* Restored original hover effect */
+    filter: brightness(1.15); /* Use filter for dynamic hover color */
     transform: scale(1.05);
 }
 
@@ -368,7 +368,7 @@ button:hover {
 
 .task.dragging {
     opacity: 0.5;
-    border: 1px dashed #5B7C99;
+    border: 1px dashed var(--accent-color); /* Use accent color */
 }
 
 #template-trash {
@@ -736,8 +736,8 @@ button:hover {
 }
 
 .calendar-nav-btn:hover {
-    background-color: #5B7C99;
-    border-color: #5B7C99;
+    background-color: var(--accent-color); /* Use accent color */
+    border-color: var(--accent-color); /* Use accent color */
 }
 
 .calendar-grid {
@@ -776,7 +776,7 @@ button:hover {
 }
 
 .calendar-day:hover {
-    background-color: rgba(91, 124, 153, 0.3);
+    background-color: rgba(91, 124, 153, 0.3); /* This can stay as a neutral hover */
 }
 
 .calendar-day.prev-month,
@@ -792,13 +792,13 @@ button:hover {
 }
 
 .calendar-day.today {
-    background-color: #5B7C99;
+    background-color: var(--accent-color); /* Use accent color */
     color: #fff;
     font-weight: 700;
 }
 
 .calendar-day.selected {
-    border-color: #8cb3d9;
+    border-color: var(--accent-color); /* Use accent color */
     background-color: rgba(91, 124, 153, 0.5);
 }
 
@@ -987,8 +987,8 @@ li label {
 }
 
 #day-task-deadline-checkbox:checked {
-    background-color: #5B7C99 !important;
-    border-color: #5B7C99 !important;
+    background-color: var(--accent-color) !important; /* Use accent color */
+    border-color: var(--accent-color) !important; /* Use accent color */
 }
 
 #day-task-deadline-checkbox:checked::after {
@@ -1003,7 +1003,7 @@ li label {
 }
 
 #day-task-deadline-checkbox:hover {
-    border-color: #5B7C99 !important;
+    border-color: var(--accent-color) !important; /* Use accent color */
     box-shadow: 0 0 5px rgba(91, 124, 153, 0.3) !important;
 }
 
@@ -1042,7 +1042,7 @@ li label {
 }
 
 .edit-btn:hover {
-    background-color: #5B7C99;
+    background-color: var(--accent-color); /* Use accent color */
     color: #fff;
     transform: scale(1.1);
 }
