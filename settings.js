@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- Dropbox OAuth 2 PKCE Constants & Functions ---
-    const DROPBOX_CLIENT_ID = 'jghzh4x67volsfv';
+    const DROPBOX_CLIENT_ID = '	q3ra3185xx6ftrd';
 
     function generateCodeVerifier() {
         const random = crypto.getRandomValues(new Uint8Array(32));
