@@ -320,7 +320,7 @@ button:hover {
 #weekdays-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 30px;
 }
 
@@ -1049,7 +1049,7 @@ li label {
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
-        padding-bottom: 10px; /* Add space for the scrollbar */
+        padding-bottom: 15px; /* Add more space for the scrollbar */
     }
 
     #suggested-tasks-list .task,
