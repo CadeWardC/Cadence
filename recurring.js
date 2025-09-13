@@ -138,47 +138,54 @@ document.addEventListener('DOMContentLoaded', () => {
         let clone = null;
         let startX, startY;
         let isDragging = false; // Flag to track if dragging has started
+        let lastScrollY = null; // To track scrolling with a second finger
 
         task.addEventListener('touchstart', e => {
-            draggedItem = e.currentTarget;
-            const rect = draggedItem.getBoundingClientRect();
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            isDragging = false; // Reset flag on new touch
-        }, { passive: true }); // Keep touchstart passive for better scroll performance initially
+            // Only start a drag for a single finger touch
+            if (e.touches.length === 1) {
+                draggedItem = e.currentTarget;
+                const rect = draggedItem.getBoundingClientRect();
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isDragging = false; // Reset flag on new touch
+                lastScrollY = null; // Reset scroll tracking
+            }
+        }, { passive: true });
 
         task.addEventListener('touchmove', e => {
             if (!draggedItem) return;
 
-            // If more than one finger is on the screen, the user is likely trying to scroll or zoom.
-            // In this case, we cancel the drag and let the browser handle the gesture.
-            if (e.touches.length > 1) {
-                // If a drag was in progress, clean it up
-                if (clone) {
-                    document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('dragover'));
-                    document.body.removeChild(clone);
-                    clone = null;
-                    draggedItem.style.opacity = '1';
-                    draggedItem = null;
-                    isDragging = false;
-                }
-                return; // Allow native browser scrolling/zooming
-            }
-
-            // Start dragging only if moved beyond a small threshold
-            if (!isDragging) {
-                const moveX = Math.abs(e.touches[0].clientX - startX);
-                const moveY = Math.abs(e.touches[0].clientY - startY);
-                if (moveX > 5 || moveY > 5) { // Threshold to prevent accidental drags
-                    isDragging = true;
-                } else {
-                    return; // Not a drag yet, allow scrolling
-                }
-            }
-            
-            // Once a single-finger drag starts, prevent scrolling
+            // Once a drag is initiated, we must prevent default to control the behavior.
             e.preventDefault();
 
+            // Handle two-finger scroll while dragging
+            if (e.touches.length > 1) {
+                // Use the second touch point to control scrolling
+                const scrollTouch = e.touches[1];
+                if (lastScrollY !== null) {
+                    const deltaY = scrollTouch.clientY - lastScrollY;
+                    window.scrollBy(0, -deltaY); // Scroll the page
+                }
+                lastScrollY = scrollTouch.clientY;
+                // Keep the first finger for dragging logic
+            } else {
+                // Reset scroll tracking when back to one finger
+                lastScrollY = null;
+            }
+
+            // Start dragging only if moved beyond a small threshold (with one finger)
+            if (!isDragging && e.touches.length === 1) {
+                const moveX = Math.abs(e.touches[0].clientX - startX);
+                const moveY = Math.abs(e.touches[0].clientY - startY);
+                if (moveX > 5 || moveY > 5) {
+                    isDragging = true;
+                } else {
+                    return; // Not a drag yet
+                }
+            }
+
+            if (!isDragging) return;
+            
             // Create clone only when dragging starts
             if (!clone) {
                 const rect = draggedItem.getBoundingClientRect();
@@ -195,12 +202,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 draggedItem.style.opacity = '0.5';
             }
 
-            const touch = e.touches[0];
-            clone.style.left = `${touch.clientX - (clone.offsetWidth / 2)}px`;
-            clone.style.top = `${touch.clientY - (clone.offsetHeight / 2)}px`;
+            // Dragging logic always follows the first finger
+            const dragTouch = e.touches[0];
+            clone.style.left = `${dragTouch.clientX - (clone.offsetWidth / 2)}px`;
+            clone.style.top = `${dragTouch.clientY - (clone.offsetHeight / 2)}px`;
 
-            // Highlight dropzone
-            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            // Highlight dropzone based on the first finger's position
+            const elementUnder = document.elementFromPoint(dragTouch.clientX, dragTouch.clientY);
             const dropzone = elementUnder ? elementUnder.closest('.dropzone') : null;
             
             document.querySelectorAll('.dropzone').forEach(dz => {
@@ -210,12 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: false }); // This listener must be active to call preventDefault
 
         task.addEventListener('touchend', e => {
+            // Reset scroll tracking on touchend
+            lastScrollY = null;
+
             if (!isDragging || !clone || !draggedItem) {
                 // If it wasn't a drag, just reset
                 draggedItem = null;
                 return;
             }
 
+            // The drop position is determined by the finger that was lifted.
+            // We use the last known position of the dragging finger.
             const touch = e.changedTouches[0];
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             const dropzone = elementUnder ? elementUnder.closest('.dropzone') : null;
