@@ -38,21 +38,21 @@ body {
     background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
     color: #f0f0f0;
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Align to top for mobile */
     min-height: 100vh;
 }
 
 .container {
     background: rgba(44, 44, 44, 0.7);
-    padding: 30px;
+    padding: 20px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 90%;
+    width: 100%;
     max-width: 1200px;
     animation: scaleIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     position: relative;
@@ -62,7 +62,8 @@ h1 {
     text-align: center;
     color: #ffffff;
     font-weight: 700;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    font-size: 2em;
 }
 
 .task-section {
@@ -316,13 +317,18 @@ button:hover {
 
 /* --- Recurring Tasks Page Styles --- */
 #weekdays-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    display: flex;
+    flex-direction: column; /* Single column for mobile */
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
-.weekday-section .task-list {
-    min-height: 40px;
+.weekday-section {
+    /* Flex properties are no longer needed with a grid layout */
+}
+
+.task-list {
+    min-height: 100px;
     background-color: rgba(0,0,0,0.1);
     border-radius: 8px;
     padding: 8px;
@@ -431,19 +437,20 @@ button:hover {
 
 .add-task-wrapper {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* Stack input and button on mobile */
+    gap: 10px;
     margin-top: 20px;
 }
 
 .add-task-wrapper input {
     flex-grow: 1;
-    margin-right: 10px;
+    margin-right: 0; /* Remove margin for stacked layout */
 }
 
 .add-task-wrapper button {
     flex-shrink: 0;
-    width: 120px;
+    width: 100%; /* Full width button on mobile */
+    margin-top: 0;
 }
 
 /* --- Settings Page Styles --- */
@@ -780,15 +787,16 @@ button:hover {
 @media (min-width: 768px) {
     body {
         align-items: center;
+        padding: 20px;
     }
 
     .container {
-        max-width: 700px;
         padding: 40px;
     }
 
     h1 {
         font-size: 2.5em;
+        margin-bottom: 30px;
     }
 
     h2 {
@@ -798,6 +806,28 @@ button:hover {
     li {
         font-size: 1.1em;
         padding: 18px 10px;
+    }
+
+    /* Recurring page grid on desktop */
+    #weekdays-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    /* Add task layout on desktop */
+    .add-task-wrapper {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .add-task-wrapper input {
+        margin-right: 10px;
+    }
+
+    .add-task-wrapper button {
+        width: 120px;
     }
 }
 
