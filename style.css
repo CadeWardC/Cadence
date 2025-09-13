@@ -80,6 +80,18 @@ h1 #date-display {
     opacity: 0.8;
 }
 
+.appearance-setting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inline-btn {
+    padding: 5px 10px;
+    font-size: 0.9em;
+    margin-top: 0;
+}
+
 .task-section {
     margin-bottom: 30px;
 }

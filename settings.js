@@ -23,12 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const autosaveIntervalSelect = document.getElementById('autosave-interval-select');
     const autosaveStatus = document.getElementById('autosave-status');
     const accentColorPicker = document.getElementById('accent-color-picker');
+    const resetColorBtn = document.getElementById('reset-color-btn');
+
+    const DEFAULT_ACCENT_COLOR = '#5B7C99';
 
     // --- Accent Color Logic ---
     function applyAccentColor(color) {
-        if (color) {
-            document.documentElement.style.setProperty('--accent-color', color);
-        }
+        document.documentElement.style.setProperty('--accent-color', color);
     }
 
     accentColorPicker.addEventListener('input', (e) => {
@@ -39,8 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('accentColor', e.target.value);
     });
 
+    resetColorBtn.addEventListener('click', () => {
+        applyAccentColor(DEFAULT_ACCENT_COLOR);
+        accentColorPicker.value = DEFAULT_ACCENT_COLOR;
+        localStorage.removeItem('accentColor'); // Remove to fall back to default
+    });
+
     // --- Dropbox OAuth 2 PKCE Constants & Functions ---
-    const DROPBOX_CLIENT_ID = '	q3ra3185xx6ftrd';
+    const DROPBOX_CLIENT_ID = 'jghzh4x67volsfv';
 
     function generateCodeVerifier() {
         const random = crypto.getRandomValues(new Uint8Array(32));
@@ -312,14 +319,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     storageSelect.value = savedMethod;
     const savedInterval = localStorage.getItem('autosaveInterval') || '300000'; // 5 minutes default
     autosaveIntervalSelect.value = savedInterval;
-    const savedColor = localStorage.getItem('accentColor');
-    if (savedColor) {
-        accentColorPicker.value = savedColor;
-        applyAccentColor(savedColor);
-    } else {
-        // Set default if nothing is saved
-        accentColorPicker.value = '#4a90e2';
-    }
+    const savedColor = localStorage.getItem('accentColor') || DEFAULT_ACCENT_COLOR;
+    accentColorPicker.value = savedColor;
+    applyAccentColor(savedColor);
 
     dropboxSettings.classList.toggle('hidden', savedMethod !== 'dropbox');
     updateDropboxUI();
@@ -364,9 +366,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // --- Data Management Event Listeners ---
     if (exportDataBtn) {
         exportDataBtn.addEventListener('click', () => {
             const dataToExport = {};
+            // This loop correctly includes 'accentColor' and all other non-sensitive settings
             const sensitiveKeys = ['dropboxAccessToken', 'dropboxRefreshToken', 'pkceCodeVerifier'];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
