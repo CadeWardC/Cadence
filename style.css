@@ -919,7 +919,6 @@ li label {
     visibility: visible;
     transform: translateY(0);
 }
-/* Additional CSS to add to your existing style.css file */
 
 /* Updated task input layout */
 .add-task-wrapper {
@@ -942,14 +941,14 @@ li label {
 
 .task-input-row .time-input {
     width: 100%;
-    padding: 15px 10px; /* Increased vertical padding */
+    padding: 18px 10px; /* Increased vertical padding for mobile */
 }
     
 .task-options-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the start (left) */
+    gap: 10px;
 }
 
 .deadline-toggle-container {
@@ -1060,12 +1059,12 @@ li label {
     
     .task-input-row .time-input {
         width: 100%;
-        padding: 15px 10px; /* Increased vertical padding */
+        padding: 18px 10px; /* Increased vertical padding for mobile */
     }
     
     .task-options-row {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start; /* Align items to the start (left) */
         gap: 10px;
     }
 
