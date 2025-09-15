@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Dropbox API Functions (moved here for global access) ---
-const DROPBOX_CLIENT_ID = 'jghzh4x67volsfv';
+const DROPBOX_CLIENT_ID = 'q3ra3185xx6ftrd';
 
 function showAutosavePopup() {
     let popup = document.getElementById('autosave-popup');
@@ -64,31 +64,32 @@ async function refreshDropboxToken() {
     }
 }
 
-async function saveToDropbox(isRetry = false, isSilent = false) {
+async function saveToDropbox(isAutosave = false, isRetry = false) {
     let accessToken = localStorage.getItem('dropboxAccessToken');
     if (!accessToken) {
-        if (!isSilent) alert('Not connected to Dropbox.');
+        if (!isAutosave) console.log('Save to Dropbox skipped: Not connected.');
         return;
     }
 
-    const dataToExport = {};
+    // --- FIX: Correctly prepare data for backup ---
+    const dataToSave = {};
+    const sensitiveKeys = ['dropboxAccessToken', 'dropboxRefreshToken', 'pkceCodeVerifier'];
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('recurringTasks') || key.startsWith('myTaskTemplates') || key.startsWith('dailyTasks') || key.startsWith('completedRecurring') || key.startsWith('calendarTasks-')) {
+        if (!sensitiveKeys.includes(key)) {
+            let value = localStorage.getItem(key);
             try {
-                dataToExport[key] = JSON.parse(localStorage.getItem(key));
+                // This ensures that JSON strings (like task lists) are stored as objects
+                // in the final backup file, preventing double-encoding.
+                dataToSave[key] = JSON.parse(value);
             } catch (e) {
-                dataToExport[key] = localStorage.getItem(key);
+                // If it's not a JSON string (e.g., 'storageMethod'), use the raw string.
+                dataToSave[key] = value;
             }
         }
     }
-    const storageMethod = localStorage.getItem('storageMethod');
-    if (storageMethod) {
-        dataToExport.storageMethod = storageMethod;
-    }
-
-    const fileContent = JSON.stringify(dataToExport, null, 2);
-    const file = new Blob([fileContent], { type: 'application/octet-stream' });
+    const fileContent = JSON.stringify(dataToSave, null, 2);
+    // --- End of fix ---
 
     try {
         const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
@@ -96,17 +97,22 @@ async function saveToDropbox(isRetry = false, isSilent = false) {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/octet-stream',
-                'Dropbox-API-Arg': JSON.stringify({ path: '/backup.td', mode: 'overwrite', autorename: false, mute: true })
+                'Dropbox-API-Arg': JSON.stringify({
+                    path: '/backup.td',
+                    mode: 'overwrite',
+                    autorename: false,
+                    mute: true
+                })
             },
-            body: file
+            body: fileContent
         });
 
         if (response.status === 401 && !isRetry) {
             const newAccessToken = await refreshDropboxToken();
             if (newAccessToken) {
-                await saveToDropbox(true, isSilent);
-            } else {
-                if (!isSilent) alert('Your Dropbox session has expired. Please reconnect.');
+                await saveToDropbox(isAutosave, true); // Retry the save
+            } else if (!isAutosave) {
+                alert('Your Dropbox session has expired. Please reconnect.');
             }
             return;
         }
@@ -116,14 +122,47 @@ async function saveToDropbox(isRetry = false, isSilent = false) {
             throw new Error(`Dropbox API error: ${response.statusText} - ${errorText}`);
         }
 
-        if (isSilent) {
-            showAutosavePopup();
+        if (!isAutosave) {
+            alert('Data successfully saved to Dropbox.');
         } else {
-            alert('Successfully saved to Dropbox!');
+            console.log('Autosave to Dropbox successful.');
+            const popup = document.getElementById('autosave-popup');
+            if (popup) {
+                popup.textContent = 'Autosaved to Dropbox!';
+                popup.classList.add('show');
+                setTimeout(() => popup.classList.remove('show'), 3000);
+            }
         }
 
     } catch (error) {
         console.error('Failed to save to Dropbox:', error);
-        if (!isSilent) alert('An error occurred while saving to Dropbox. Check the console for details.');
+        if (!isAutosave) {
+            alert('An error occurred while saving to Dropbox. Check the console for details.');
+        }
+    }
+}
+
+async function refreshDropboxToken() {
+    const refreshToken = localStorage.getItem('dropboxRefreshToken');
+    if (!refreshToken) return null;
+    try {
+        const response = await fetch('https://api.dropboxapi.com/oauth2/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ 'grant_type': 'refresh_token', 'refresh_token': refreshToken, 'client_id': DROPBOX_CLIENT_ID, }),
+        });
+        if (!response.ok) throw new Error('Failed to refresh token.');
+        const data = await response.json();
+        localStorage.setItem('dropboxAccessToken', data.access_token);
+        return data.access_token;
+    } catch (error) {
+        console.error('Dropbox token refresh error:', error);
+        localStorage.removeItem('dropboxAccessToken');
+        localStorage.removeItem('dropboxRefreshToken');
+        // If on settings page, update UI. Otherwise, just fail silently.
+        if (typeof updateDropboxUI === 'function') {
+            updateDropboxUI();
+        }
+        return null;
     }
 }

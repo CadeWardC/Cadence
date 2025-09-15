@@ -25,29 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const accentColorPicker = document.getElementById('accent-color-picker');
     const resetColorBtn = document.getElementById('reset-color-btn');
 
-    const DEFAULT_ACCENT_COLOR = '#5B7C99';
-
-    // --- Accent Color Logic ---
-    function applyAccentColor(color) {
-        document.documentElement.style.setProperty('--accent-color', color);
-    }
-
-    accentColorPicker.addEventListener('input', (e) => {
-        applyAccentColor(e.target.value);
-    });
-
-    accentColorPicker.addEventListener('change', (e) => {
-        localStorage.setItem('accentColor', e.target.value);
-    });
-
-    resetColorBtn.addEventListener('click', () => {
-        applyAccentColor(DEFAULT_ACCENT_COLOR);
-        accentColorPicker.value = DEFAULT_ACCENT_COLOR;
-        localStorage.removeItem('accentColor'); // Remove to fall back to default
-    });
-
     // --- Dropbox OAuth 2 PKCE Constants & Functions ---
-    const DROPBOX_CLIENT_ID = 'jghzh4x67volsfv';
+    const DROPBOX_CLIENT_ID = 'q3ra3185xx6ftrd';
 
     function generateCodeVerifier() {
         const random = crypto.getRandomValues(new Uint8Array(32));
@@ -191,6 +170,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAutosaveAndStatus();
     }
 
+    // --- Accent Color Logic ---
+    const DEFAULT_ACCENT_COLOR = '#5B7C99';
+
+    function applyAccentColor(color) {
+        document.documentElement.style.setProperty('--accent-color', color);
+    }
+
+    accentColorPicker.addEventListener('input', (e) => {
+        applyAccentColor(e.target.value);
+    });
+
+    accentColorPicker.addEventListener('change', (e) => {
+        localStorage.setItem('accentColor', e.target.value);
+    });
+
+    resetColorBtn.addEventListener('click', () => {
+        applyAccentColor(DEFAULT_ACCENT_COLOR);
+        accentColorPicker.value = DEFAULT_ACCENT_COLOR;
+        localStorage.removeItem('accentColor'); // Remove to fall back to default
+    });
+
     // --- Refactored Modal Logic ---
     let confirmAction = null;
 
@@ -315,17 +315,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- Initialization ---
-    const savedMethod = localStorage.getItem('storageMethod') || 'local';
-    storageSelect.value = savedMethod;
-    const savedInterval = localStorage.getItem('autosaveInterval') || '300000'; // 5 minutes default
-    autosaveIntervalSelect.value = savedInterval;
-    const savedColor = localStorage.getItem('accentColor') || DEFAULT_ACCENT_COLOR;
-    accentColorPicker.value = savedColor;
-    applyAccentColor(savedColor);
+    function initializeSettingsPage() {
+        // FIX: This logic is being rewritten to reliably find and reorder the main section containers.
+        try {
+            const parentContainer = document.querySelector('.container');
+            if (!parentContainer) throw new Error("Main '.container' not found.");
 
-    dropboxSettings.classList.toggle('hidden', savedMethod !== 'dropbox');
-    updateDropboxUI();
-    updateAutosaveStatus();
+            // Helper function to find the main section container for an element.
+            // This assumes the section is a direct child of the main '.container'.
+            const findSectionContainer = (elementId) => {
+                const el = document.getElementById(elementId);
+                let parent = el ? el.parentElement : null;
+                while (parent && parent.parentElement !== parentContainer) {
+                    parent = parent.parentElement;
+                }
+                return parent;
+            };
+
+            // Get references to each section's wrapper element.
+            const storageSection = findSectionContainer('storage-select');
+            const dropboxSection = document.getElementById('dropbox-settings'); // This ID is on the section itself.
+            const appearanceSection = findSectionContainer('accent-color-picker');
+            const dataManagementSection = findSectionContainer('export-data-btn');
+            const dangerZoneSection = findSectionContainer('clear-data-btn');
+
+            // Define the correct order.
+            const sectionsInOrder = [
+                storageSection,
+                dropboxSection,
+                appearanceSection,
+                dataManagementSection,
+                dangerZoneSection
+            ];
+
+            // Append each section in the correct order. `appendChild` moves existing elements.
+            sectionsInOrder.forEach(section => {
+                if (section) {
+                    parentContainer.appendChild(section);
+                } else {
+                    console.warn("A settings section could not be found for reordering.");
+                }
+            });
+        } catch (error) {
+            console.error("Failed to reorder settings page layout:", error);
+        }
+
+
+        // Set initial values from localStorage
+        const savedMethod = localStorage.getItem('storageMethod') || 'local';
+        storageSelect.value = savedMethod;
+        const savedInterval = localStorage.getItem('autosaveInterval') || '300000';
+        autosaveIntervalSelect.value = savedInterval;
+        const savedColor = localStorage.getItem('accentColor') || DEFAULT_ACCENT_COLOR;
+        accentColorPicker.value = savedColor;
+        applyAccentColor(savedColor);
+
+        // Set initial UI visibility
+        dropboxSettings.classList.toggle('hidden', savedMethod !== 'dropbox');
+        updateDropboxUI();
+        updateAutosaveStatus();
+    }
+
+    // Run the initialization function
+    initializeSettingsPage();
+
 
     // --- Import/Export/Clear Data Logic (Updated to use new modal) ---
     if (importDataBtn && importFileInput) {
@@ -370,12 +423,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (exportDataBtn) {
         exportDataBtn.addEventListener('click', () => {
             const dataToExport = {};
-            // This loop correctly includes 'accentColor' and all other non-sensitive settings
             const sensitiveKeys = ['dropboxAccessToken', 'dropboxRefreshToken', 'pkceCodeVerifier'];
+            
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (!sensitiveKeys.includes(key)) {
-                    dataToExport[key] = localStorage.getItem(key);
+                    let value = localStorage.getItem(key);
+                    try {
+                        // FIX: Attempt to parse the value as JSON. If it's an object or array,
+                        // it will be correctly handled by the final JSON.stringify.
+                        // If it's just a string (like 'storageMethod'), it will throw an error
+                        // and we'll use the original string value.
+                        dataToExport[key] = JSON.parse(value);
+                    } catch (e) {
+                        // The value was not a JSON string, so use it as is.
+                        dataToExport[key] = value;
+                    }
                 }
             }
             
@@ -405,4 +468,126 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
         });
     }
+
+    // --- Calendar Logic ---
+    const calendarEl = document.getElementById('calendar');
+    const monthYearLabel = document.getElementById('month-year-label');
+    const prevMonthBtn = document.getElementById('prev-month-btn');
+    const nextMonthBtn = document.getElementById('next-month-btn');
+    const todayBtn = document.getElementById('today-btn');
+
+    let currentDate = new Date();
+    let selectedDate = new Date();
+
+    function renderCalendar(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+
+        // Update the month/year label
+        monthYearLabel.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+        // Clear the calendar body
+        const calendarBody = document.getElementById('calendar-body');
+        calendarBody.innerHTML = '';
+
+        // Get the first day of the month and the number of days in the month
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+
+        // Get the day of the week for the first day of the month (0 = Sunday, 6 = Saturday)
+        const startDay = firstDayOfMonth.getDay();
+
+        // Add empty cells for days of the week before the first day of the month
+        for (let i = 0; i < startDay; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('calendar-day', 'empty');
+            calendarBody.appendChild(emptyCell);
+        }
+
+        // Add the actual days of the month
+        for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+            const dayCell = document.createElement('div');
+            dayCell.classList.add('calendar-day', 'current-month');
+
+            // Mark the selected day
+            if (year === selectedDate.getFullYear() && month === selectedDate.getMonth() && i === selectedDate.getDate()) {
+                dayCell.classList.add('selected');
+            }
+
+            const tasksOnDay = getTasksForDay(new Date(year, month, i));
+
+            // Add task indicators first
+            if (tasksOnDay.length > 0) {
+                const indicatorsContainer = document.createElement('div');
+                indicatorsContainer.className = 'day-indicators';
+
+                const hasUniqueTask = tasksOnDay.some(task => !task.isDeadline);
+                const hasDeadlineTask = tasksOnDay.some(task => task.isDeadline);
+
+                if (hasUniqueTask) {
+                    const uniqueIndicator = document.createElement('div');
+                    uniqueIndicator.className = 'day-indicator unique';
+                    indicatorsContainer.appendChild(uniqueIndicator);
+                }
+
+                if (hasDeadlineTask) {
+                    const deadlineIndicator = document.createElement('div');
+                    deadlineIndicator.className = 'day-indicator deadline';
+                    indicatorsContainer.appendChild(deadlineIndicator);
+                }
+                
+                dayCell.appendChild(indicatorsContainer);
+            }
+
+            // Then add the task text previews
+            if (tasksOnDay.length > 0) {
+                const tasksContainer = document.createElement('div');
+                tasksContainer.className = 'tasks-container';
+                tasksOnDay.slice(0, 2).forEach(task => {
+                    const taskEl = document.createElement('div');
+                    taskEl.className = 'task-preview';
+                    taskEl.textContent = task.title;
+                    tasksContainer.appendChild(taskEl);
+                });
+                dayCell.appendChild(tasksContainer);
+            }
+
+            calendarBody.appendChild(dayCell);
+        }
+
+        const remainingCells = 42 - calendarBody.children.length;
+        for (let i = 0; i < remainingCells; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('calendar-day', 'empty');
+            calendarBody.appendChild(emptyCell);
+        };
+    }
+
+    function getTasksForDay(date) {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        return tasks.filter(task => {
+            const taskDate = new Date(task.date);
+            return taskDate.getFullYear() === date.getFullYear() &&
+                   taskDate.getMonth() === date.getMonth() &&
+                   taskDate.getDate() === date.getDate();
+        });
+    }
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar(currentDate);
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar(currentDate);
+    });
+
+    todayBtn.addEventListener('click', () => {
+        currentDate = new Date();
+        renderCalendar(currentDate);
+    });
+
+    // Initial render
+    renderCalendar(currentDate);
 });

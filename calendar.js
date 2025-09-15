@@ -13,15 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const dayTasksHeader = document.getElementById('day-tasks-header');
     const dayTaskList = document.getElementById('day-task-list');
     const dayTaskInput = document.getElementById('day-task-input');
-    const addDayTaskBtn = document.getElementById('add-day-task-btn');
-    const dayTaskTimeInput = document.getElementById('day-task-time-input');
+    const dayTaskTime = document.getElementById('day-task-time');
+    const dayTaskTags = document.getElementById('day-task-tags');
     const dayTaskDeadlineCheckbox = document.getElementById('day-task-deadline-checkbox');
+    const addDayTaskBtn = document.getElementById('add-day-task-btn');
+    const dayTasksList = document.getElementById('day-tasks-list');
 
     // Modal elements
     const taskModal = document.getElementById('task-modal');
     const modalTitle = document.getElementById('modal-title');
     const taskNameInput = document.getElementById('task-name-input');
     const taskTimeInput = document.getElementById('task-time-input');
+    const taskTagsInput = document.getElementById('task-tags-input'); // Add this selector
     const taskDeadlineCheckbox = document.getElementById('task-deadline-checkbox');
     const saveTaskBtn = document.getElementById('save-task-btn');
     const deleteTaskBtn = document.getElementById('delete-task-btn');
@@ -61,51 +64,78 @@ document.addEventListener('DOMContentLoaded', () => {
             li.dataset.taskId = task.id;
 
             const timeDisplay = task.time ? `<span class="task-time">${formatTime(task.time)}</span>` : '';
-            const deadlineIndicator = task.isDeadline ? ` <span style="color: #e57373; font-weight: bold;">(Deadline)</span>` : '';
+            const deadlineIndicator = task.isDeadline ? ` <span class="deadline-badge">(Deadline)</span>` : '';
 
             li.innerHTML = `
                 <input type="checkbox" ${task.completed ? 'checked' : ''}>
-                ${timeDisplay}
-                <label>${task.text}${deadlineIndicator}</label>
+                <label>
+                    ${timeDisplay}
+                    <span class="task-text">${task.text}</span>
+                    ${deadlineIndicator}
+                </label>
                 <button class="edit-btn" title="Edit Task">✏️</button>
                 <button class="delete-btn">×</button>
             `;
+
+            // Add tags if they exist
+            if (task.tags && task.tags.length > 0) {
+                const tagsContainer = document.createElement('div');
+                tagsContainer.classList.add('tags-container'); // Use consistent class name
+                task.tags.forEach(tag => {
+                    const tagSpan = document.createElement('span');
+                    tagSpan.className = 'task-tag'; // Use consistent class name
+                    tagSpan.textContent = tag;
+                    tagsContainer.appendChild(tagSpan);
+                });
+                // FIX: Append tags inside the label, not the list item
+                li.querySelector('label').appendChild(tagsContainer);
+            }
+
             dayTaskList.appendChild(li);
         });
     }
 
     function addTask() {
         const text = dayTaskInput.value.trim();
-        const time = dayTaskTimeInput.value;
+        const time = dayTaskTime.value;
         const isDeadline = dayTaskDeadlineCheckbox.checked;
-        
-        if (text === '') return;
+        const tags = dayTaskTags.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
 
-        let tasks = getTasksForDay(selectedDate);
-        const newTask = {
-            id: Date.now(),
+        if (!text) {
+            alert('Please enter a task description.');
+            return;
+        }
+
+        const task = {
+            id: `task-${Date.now()}`,
             text: text,
             time: time,
             completed: false,
-            isDeadline: isDeadline
+            isDeadline: isDeadline, // FIX: Ensure this property is always set
+            tags: tags
         };
-        tasks.push(newTask);
-        saveTasksForDay(selectedDate, tasks);
 
-        // MODIFICATION: Also save to the global deadline list if it's a deadline
         if (isDeadline) {
+            // Also save to the global deadline list if it's a deadline
             const deadlineTasks = JSON.parse(localStorage.getItem('deadlineTasks')) || {};
             const deadlineDateKey = getLocalDayKey(selectedDate);
-            deadlineTasks[newTask.id] = { ...newTask, deadlineDateKey: deadlineDateKey };
+            deadlineTasks[task.id] = { ...task, deadlineDateKey: deadlineDateKey };
             localStorage.setItem('deadlineTasks', JSON.stringify(deadlineTasks));
         }
-        
+
+        let tasks = getTasksForDay(selectedDate);
+        tasks.push(task);
+        saveTasksForDay(selectedDate, tasks);
+
         renderTasks(selectedDate);
-        
+
         // Clear the form
         dayTaskInput.value = '';
-        dayTaskTimeInput.value = '';
+        dayTaskTime.value = '';
+        dayTaskTags.value = '';
         dayTaskDeadlineCheckbox.checked = false;
+
+        renderCalendar(); // Refresh calendar indicators
     }
 
     function formatTime(timeString) {
@@ -176,6 +206,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayCell.classList.add('selected');
             }
 
+            // Add task indicators
+            const tasksOnDay = getTasksForDay(new Date(year, month, i));
+            if (tasksOnDay.length > 0) {
+                const indicatorsContainer = document.createElement('div');
+                indicatorsContainer.className = 'day-indicators';
+
+                const hasUniqueTask = tasksOnDay.some(task => !task.isDeadline);
+                const hasDeadlineTask = tasksOnDay.some(task => task.isDeadline);
+
+                if (hasUniqueTask) {
+                    const uniqueIndicator = document.createElement('div');
+                    uniqueIndicator.className = 'day-indicator unique';
+                    indicatorsContainer.appendChild(uniqueIndicator);
+                }
+
+                if (hasDeadlineTask) {
+                    const deadlineIndicator = document.createElement('div');
+                    deadlineIndicator.className = 'day-indicator deadline';
+                    indicatorsContainer.appendChild(deadlineIndicator);
+                }
+                
+                dayCell.appendChild(indicatorsContainer);
+            }
+
             calendarBody.appendChild(dayCell);
         }
 
@@ -194,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalTitle.textContent = 'Edit Task';
         taskNameInput.value = task.text;
         taskTimeInput.value = task.time || '';
+        taskTagsInput.value = task.tags ? task.tags.join(', ') : ''; // Load tags into modal
         taskDeadlineCheckbox.checked = !!task.isDeadline;
         currentEditingTaskId = task.id;
         deleteTaskBtn.classList.remove('hidden');
@@ -210,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const taskTime = taskTimeInput.value;
         const isDeadline = taskDeadlineCheckbox.checked;
+        const tags = taskTagsInput.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== ''); // Get tags from modal
 
         const [year, month, day] = currentEditingDateKey.split('-').map(Number);
         const taskDate = new Date(year, month - 1, day);
@@ -223,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             task.text = taskName;
             task.time = taskTime;
             task.isDeadline = isDeadline;
+            task.tags = tags; // Save tags to the task object
         }
 
         saveTasksForDay(taskDate, tasks);
@@ -321,14 +378,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = e.target.closest('li');
         if (!li || !li.dataset.taskId) return;
 
-        const taskId = parseInt(li.dataset.taskId, 10);
+        const taskId = li.dataset.taskId; // FIX: Task ID is a string, not a number. Do not parse it.
         let tasks = getTasksForDay(selectedDate);
 
         if (e.target.matches('.delete-btn')) {
-            deleteTaskFromStorage(taskId);
-            tasks = tasks.filter(task => task.id !== taskId);
-            saveTasksForDay(selectedDate, tasks);
-            renderTasks(selectedDate);
+            if (confirm('Are you sure you want to delete this task?')) {
+                deleteTaskFromStorage(taskId);
+                tasks = tasks.filter(task => task.id !== taskId);
+                saveTasksForDay(selectedDate, tasks);
+                renderTasks(selectedDate);
+                renderCalendar(); // Update calendar indicators
+            }
         } else if (e.target.matches('.edit-btn')) {
             const task = tasks.find(t => t.id === taskId);
             if (task) {
@@ -341,7 +401,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 task.completed = e.target.checked;
             }
             saveTasksForDay(selectedDate, tasks);
-            renderTasks(selectedDate);
+            // No full re-render needed, just toggle a class
+            li.classList.toggle('completed', e.target.checked);
         }
     });
 

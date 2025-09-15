@@ -53,5 +53,43 @@
     <script src="script.js"></script>
     <script src="autosave.js"></script>
     <script src="menu.js"></script>
+
+    <!-- Weekly Analytics Modal -->
+    <div id="analytics-modal" class="modal-overlay hidden">
+        <div class="modal-content analytics-content">
+            <button id="close-analytics-btn" class="close-modal-btn">&times;</button>
+            <h2>Weekly Report</h2>
+            <p class="analytics-subtitle">Your progress from the past 7 days</p>
+
+            <div class="analytics-grid">
+                <!-- Metric 1: Recurring Task Days -->
+                <div class="metric-card">
+                    <h3>Perfect Routine Days</h3>
+                    <p class="metric-value" id="analytics-recurring-days">0/7</p>
+                    <div class="bar-chart">
+                        <div id="recurring-bar" class="bar"></div>
+                    </div>
+                </div>
+
+                <!-- Metric 2: Deadlines Met -->
+                <div class="metric-card">
+                    <h3>Deadlines Met</h3>
+                    <p class="metric-value" id="analytics-deadlines-met">0</p>
+                    <div class="bar-chart">
+                        <div id="deadlines-bar" class="bar"></div>
+                    </div>
+                </div>
+
+                <!-- Metric 3: Total Tasks Completed -->
+                <div class="metric-card">
+                    <h3>Total Tasks Done</h3>
+                    <p class="metric-value" id="analytics-total-tasks">0</p>
+                    <div class="bar-chart">
+                        <div id="total-tasks-bar" class="bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -249,6 +249,22 @@ button:hover {
     color: #888;
 }
 
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.task-tag {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ddd;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
 /* --- Side Menu Styles --- */
 .menu-btn {
     position: fixed;
@@ -301,22 +317,34 @@ button:hover {
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 1000;
     padding-top: 80px;
+    /* FIX: Add flex properties to manage the layout of direct child buttons */
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Adds a small space between each button */
 }
 
 .menu-open .side-menu {
     transform: translateX(0);
 }
 
-.menu-item {
+/* FIX: Remove the obsolete .side-menu ul and .side-menu li rules */
+
+.menu-nav-btn {
     display: block;
-    color: #f0f0f0;
-    text-decoration: none;
-    font-size: 1.2em;
-    padding: 15px 30px;
+    width: 100%;
+    padding: 15px 20px;
+    background-color: transparent;
+    border: none;
+    color: #e0e0e0;
+    text-align: left;
+    font-size: 1.1em;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+    border-radius: 0; /* Remove border-radius for a full-width look */
 }
 
-.menu-item:hover {
+.menu-nav-btn:hover {
     background-color: var(--accent-color);
     color: #fff;
 }
@@ -781,6 +809,7 @@ button:hover {
     cursor: pointer;
     border: 2px solid transparent;
     overflow: hidden; /* Hide overflowing tasks */
+    position: relative; /* FIX: Make this the positioning context for indicators */
 }
 
 .calendar-day .day-number {
@@ -804,18 +833,46 @@ button:hover {
 }
 
 .calendar-day.today {
-    background-color: var(--accent-color); /* Use accent color */
+    background-color: var(--accent-color);
     color: #fff;
     font-weight: 700;
 }
 
+.day-indicators {
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.day-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.day-indicator.unique {
+    background-color: var(--accent-color);
+}
+
+.day-indicator.deadline {
+    background-color: #e57373; /* Red for deadlines */
+}
+
 .calendar-day.selected {
-    border-color: var(--accent-color); /* Use accent color */
-    background-color: rgba(91, 124, 153, 0.5);
+    border-color: var(--accent-color);
+    /* FIX: Use the accent color with 50% transparency. 
+       The '80' at the end of the hex code represents the alpha channel. */
+    background-color: var(--accent-color)80; 
 }
 
 .calendar .tasks-container {
     width: 100%;
+    padding: 2px;
     margin-top: 4px;
 }
 
@@ -1057,6 +1114,119 @@ li label {
     background-color: var(--accent-color); /* Use accent color */
     color: #fff;
     transform: scale(1.1);
+}
+
+/* --- Analytics Modal Styles --- */
+.analytics-content {
+    max-width: 700px;
+    text-align: left;
+    padding: 25px;
+}
+
+.analytics-content h2 {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.analytics-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.range-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ccc;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9em;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.range-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.range-btn.active {
+    background-color: var(--accent-color);
+    color: #fff;
+    font-weight: 500;
+}
+
+.analytics-subtitle {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: #aaa;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.metric-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-card h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+    color: #e0e0e0;
+}
+
+.metric-value {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #fff;
+    margin: 10px 0;
+}
+
+.bar-chart {
+    width: 100%;
+    background-color: #2a2a2a;
+    border-radius: 5px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.bar-chart .bar {
+    height: 100%;
+    width: 0%; /* Set dynamically by JS */
+    background-color: var(--accent-color);
+    border-radius: 5px;
+    transition: width 1s ease-out;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 28px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal-btn:hover {
+    color: #fff;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* Responsive adjustments */

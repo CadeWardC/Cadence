@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadence - Weekly Analytics</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="menu-btn">
+        <span></span>
+    </button>
+
+    <nav class="side-menu"></nav>
+    <div class="overlay"></div>
+
+    <div class="container">
+        <div class="analytics-page-content">
+            <h2>Productivity Report</h2>
+            <div class="analytics-controls">
+                <button class="range-btn active" data-range="weekly">Weekly</button>
+                <button class="range-btn" data-range="monthly">Monthly</button>
+                <button class="range-btn" data-range="ytd">Year to Date</button>
+                <button class="range-btn" data-range="yearly">Yearly</button>
+                <button class="range-btn" data-range="all-time">All Time</button>
+            </div>
+            <p class="analytics-subtitle">Your progress for the current week</p>
+
+            <div class="analytics-grid">
+                <!-- Metric 1: Recurring Task Days -->
+                <div class="metric-card">
+                    <h3>Perfect Routine Days</h3>
+                    <p class="metric-value" id="analytics-recurring-days">0/7</p>
+                    <div class="bar-chart">
+                        <div id="recurring-bar" class="bar"></div>
+                    </div>
+                </div>
+
+                <!-- Metric 2: Deadlines Met -->
+                <div class="metric-card">
+                    <h3>Deadlines Met</h3>
+                    <p class="metric-value" id="analytics-deadlines-met">0</p>
+                    <div class="bar-chart">
+                        <div id="deadlines-bar" class="bar"></div>
+                    </div>
+                </div>
+
+                <!-- Metric 3: Total Tasks Completed -->
+                <div class="metric-card">
+                    <h3>Total Tasks Done</h3>
+                    <p class="metric-value" id="analytics-total-tasks">0</p>
+                    <div class="bar-chart">
+                        <div id="total-tasks-bar" class="bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="utils.js"></script>
+    <script src="analytics.js"></script>
+    <script src="menu.js"></script>
+</body>
+</html>

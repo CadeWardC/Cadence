@@ -55,8 +55,11 @@
             </ul>
             <div class="add-task-wrapper">
                 <div class="task-input-row">
-                    <input type="text" id="day-task-input" placeholder="Add a new task for this day...">
-                    <input type="time" id="day-task-time-input" class="time-input">
+                    <input type="text" id="day-task-input" placeholder="New task description...">
+                    <input type="time" id="day-task-time" class="time-input">
+                </div>
+                <div class="task-input-row">
+                    <input type="text" id="day-task-tags" placeholder="Tags (comma-separated)...">
                 </div>
                 <div class="task-options-row">
                     <div class="deadline-toggle-container">
@@ -71,15 +74,15 @@
     <div id="autosave-popup"></div>
     <div id="task-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 id="modal-title">Edit Task</h3>
-            <input type="hidden" id="task-id-input">
-            <input type="text" id="task-name-input" placeholder="Task name..." required>
-            <div class="task-input-group">
-                <input type="time" id="task-time-input">
-                <div class="deadline-checkbox-container">
+            <h2 id="modal-title">Edit Task</h2>
+            <input type="text" id="task-name-input" placeholder="Task Name">
+            <input type="time" id="task-time-input">
+            <input type="text" id="task-tags-input" placeholder="Tags (comma-separated)">
+            <div class="modal-options">
+                <label>
                     <input type="checkbox" id="task-deadline-checkbox">
-                    <label for="task-deadline-checkbox">Deadline (Open until this date)</label>
-                </div>
+                    Deadline (Open until this date)
+                </label>
             </div>
             <div class="modal-buttons">
                 <button id="save-task-btn">Save</button>
