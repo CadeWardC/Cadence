@@ -1381,4 +1381,80 @@ li label {
     flex-grow: 1;
     margin-top: 0;
 }
+
 /* --- End Global Modal Styles --- */
+
+/* --- Responsive Styles for Recurring Page (Mobile) --- */
+@media (max-width: 768px) {
+    /* On mobile, the panels become horizontal scrolling containers */
+    #my-tasks-panel,
+    #suggested-tasks-panel {
+        display: none; /* Keep tab functionality */
+        align-items: center;
+        overflow-x: auto;
+        padding: 15px;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 10px;
+        margin-bottom: 20px;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    #my-tasks-panel.active,
+    #suggested-tasks-panel.active {
+        display: flex; /* Show the active panel as a flex container */
+    }
+
+    /* Style the scrollbar for a cleaner look */
+    #my-tasks-panel::-webkit-scrollbar,
+    #suggested-tasks-panel::-webkit-scrollbar {
+        height: 8px;
+    }
+    #my-tasks-panel::-webkit-scrollbar-track,
+    #suggested-tasks-panel::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+        border-radius: 4px;
+    }
+    #my-tasks-panel::-webkit-scrollbar-thumb,
+    #suggested-tasks-panel::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 4px;
+    }
+
+    /* Adjust the 'Add Task' input area */
+    .add-task-wrapper {
+        display: flex;
+        align-items: center;
+        padding-right: 15px;
+        border-right: 2px solid rgba(255,255,255,0.1);
+        margin-right: 15px;
+    }
+
+    .add-task-wrapper input {
+        width: 150px; /* Give it a fixed width */
+        margin-top: 0;
+    }
+
+    .add-task-wrapper button {
+        margin-top: 0;
+        flex-shrink: 0;
+    }
+
+    /* Make the task lists horizontal */
+    #my-tasks-list,
+    #suggested-tasks-list {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        min-height: 50px;
+        flex-grow: 1;
+        padding: 0;
+    }
+
+    /* Ensure tasks don't shrink or wrap */
+    #my-tasks-list .task,
+    #suggested-tasks-list .task {
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin-bottom: 0; /* Override default margin */
+    }
+}
