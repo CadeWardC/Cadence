@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'Home', url: 'index.html' },
         { name: 'Recurring', url: 'recurring.html' },
         { name: 'Calendar', url: 'calendar.html' },
+        { name: 'Sustained', url: 'sustained.html' },
         { name: 'Analytics', url: 'analytics.html' },
         { name: 'Settings', url: 'settings.html' }
     ];

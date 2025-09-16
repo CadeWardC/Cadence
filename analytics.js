@@ -2,29 +2,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const rangeButtons = document.querySelectorAll('.range-btn');
     const subtitle = document.querySelector('.analytics-subtitle');
 
-    // Helper function to find the date of the first task ever created.
+    // This is assumed to exist in utils.js, but is included here for clarity.
+    function getLocalDayKey(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function findFirstTaskDate() {
         let earliestDate = null;
-
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key.startsWith('calendarTasks-')) {
-                // Extract the date string 'YYYY-MM-DD' from the key
-                const dateStr = key.substring('calendarTasks-'.length);
-                const currentDate = new Date(dateStr.replace(/-/g, '/')); // Use '/' for better compatibility
-
+            if (key.startsWith('calendarTasks-') || key.startsWith('completedRecurring-')) {
+                const dateStr = key.substring(key.indexOf('-') + 1);
+                const currentDate = new Date(dateStr.replace(/-/g, '/'));
                 if (!earliestDate || currentDate < earliestDate) {
                     earliestDate = currentDate;
                 }
             }
         }
-        // If no tasks are found, default to today.
         return earliestDate || new Date();
     }
 
-    // Main function to calculate and display analytics for a given range
     function updateAnalytics(range = 'weekly') {
-        // --- 1. Determine Precise Date Range ---
         const today = new Date();
         let startDate, endDate;
         let subtitleText = '';
@@ -35,9 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
                 subtitleText = `Your progress for the current month`;
                 break;
-            case 'ytd': // Year to Date
+            case 'ytd':
                 startDate = new Date(today.getFullYear(), 0, 1);
-                endDate = today;
+                endDate = new Date();
                 subtitleText = `Your progress from Jan 1 to today`;
                 break;
             case 'yearly':
@@ -46,58 +47,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 subtitleText = `Your progress for the current year`;
                 break;
             case 'all-time':
-                // FIX: Find the actual first task date instead of approximating.
                 startDate = findFirstTaskDate();
-                endDate = today;
+                endDate = new Date();
                 subtitleText = 'Your progress from all time';
                 break;
             case 'weekly':
             default:
-                const firstDayOfWeek = today.getDate() - today.getDay(); // Get Sunday's date
-                startDate = new Date(today.setDate(firstDayOfWeek));
-                endDate = new Date(startDate);
-                endDate.setDate(startDate.getDate() + 6); // Saturday
+                const weekStart = new Date();
+                weekStart.setHours(0, 0, 0, 0);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                startDate = weekStart;
+                const weekEnd = new Date(startDate);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                endDate = weekEnd;
                 subtitleText = 'Your progress for the current week (Sun-Sat)';
                 break;
         }
         subtitle.textContent = subtitleText;
 
-        // --- 2. Initialize Counters ---
-        const recurringTasksData = JSON.parse(localStorage.getItem('recurringTasks')) || {};
-        const deadlineTasksObject = JSON.parse(localStorage.getItem('deadlineTasks')) || {};
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+
+        // --- DEFINITIVE FIX for Data Collection ---
+        // This unified logic correctly sums all task types for each day.
+        const dailyCounts = {};
         let perfectRoutineDays = 0;
-        let deadlinesMet = 0;
-        let totalTasksCompleted = 0;
-        let totalDeadlinesInPeriod = 0;
         let daysInPeriod = 0;
 
-        // --- 3. Loop Through Data and Calculate Stats ---
-        // Ensure start and end dates are at the beginning of their respective days for accurate looping
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(0, 0, 0, 0);
+        // Pre-load all task data once to avoid repeated parsing in the loop
+        const recurringTasksData = JSON.parse(localStorage.getItem('recurringTasks')) || {};
+        const uniqueTasks = JSON.parse(localStorage.getItem('uniqueTasks')) || {};
+        const deadlineTasks = JSON.parse(localStorage.getItem('deadlineTasks')) || {};
 
-        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        let loopDate = new Date(startDate);
+        while (loopDate <= endDate) {
             daysInPeriod++;
-            const dayKey = getLocalDayKey(d);
-            const dayName = d.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+            const dayKey = getLocalDayKey(loopDate);
+            let tasksCompletedOnThisDay = 0;
 
-            // Recurring tasks
-            const requiredRecurring = recurringTasksData[dayName] || [];
+            // 1. Count completed recurring tasks for this day
             const completedRecurring = JSON.parse(localStorage.getItem(`completedRecurring-${dayKey}`)) || [];
+            tasksCompletedOnThisDay += completedRecurring.length;
+
+            // 2. Count completed unique tasks for this day
+            Object.values(uniqueTasks).forEach(task => {
+                if (task.completed && task.completionDate === dayKey) {
+                    tasksCompletedOnThisDay++;
+                }
+            });
+
+            // 3. Count completed deadline tasks for this day
+            Object.values(deadlineTasks).forEach(task => {
+                if (task.completed && task.completionDate === dayKey) {
+                    tasksCompletedOnThisDay++;
+                }
+            });
+
+            // Store the final, correct total for the day
+            if (tasksCompletedOnThisDay > 0) {
+                dailyCounts[dayKey] = tasksCompletedOnThisDay;
+            }
+
+            // Check for perfect routine days
+            const dayName = loopDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+            const requiredRecurring = recurringTasksData[dayName] || [];
             if (requiredRecurring.length > 0 && requiredRecurring.every(task => completedRecurring.includes(task))) {
                 perfectRoutineDays++;
             }
-            totalTasksCompleted += completedRecurring.length;
 
-            // Unique/Calendar tasks
-            const dailyTasks = JSON.parse(localStorage.getItem(`calendarTasks-${dayKey}`)) || [];
-            totalTasksCompleted += dailyTasks.filter(task => task.completed).length;
+            loopDate.setDate(loopDate.getDate() + 1);
         }
 
-        // Deadline tasks
-        Object.values(deadlineTasksObject).forEach(task => {
+        // Calculate totals from the accurate data
+        const totalTasksCompleted = Object.values(dailyCounts).reduce((sum, count) => sum + count, 0);
+        let deadlinesMet = 0;
+        let totalDeadlinesInPeriod = 0;
+        Object.values(deadlineTasks).forEach(task => {
             const dueDate = new Date(task.deadlineDateKey.replace(/-/g, '/'));
-            dueDate.setHours(0, 0, 0, 0);
             if (dueDate >= startDate && dueDate <= endDate) {
                 totalDeadlinesInPeriod++;
                 if (task.completed) {
@@ -106,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 4. Update UI Elements ---
+        // --- Update UI ---
         document.getElementById('analytics-recurring-days').textContent = `${perfectRoutineDays}/${daysInPeriod}`;
         document.getElementById('analytics-deadlines-met').textContent = `${deadlinesMet}`;
         document.getElementById('analytics-total-tasks').textContent = totalTasksCompleted;
@@ -114,22 +140,124 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             document.getElementById('recurring-bar').style.width = daysInPeriod > 0 ? `${(perfectRoutineDays / daysInPeriod) * 100}%` : '0%';
             document.getElementById('deadlines-bar').style.width = totalDeadlinesInPeriod > 0 ? `${(deadlinesMet / totalDeadlinesInPeriod) * 100}%` : '0%';
-            const totalTaskGoal = daysInPeriod * 5; // Dynamic goal (e.g., 5 tasks per day)
+            const totalTaskGoal = daysInPeriod * 5;
             document.getElementById('total-tasks-bar').style.width = totalTaskGoal > 0 ? `${Math.min(100, (totalTasksCompleted / totalTaskGoal) * 100)}%` : '0%';
         }, 100);
+
+        const isLongRange = ['ytd', 'yearly', 'all-time'].includes(range);
+        if (isLongRange) {
+            renderMonthlyActivityGraph(dailyCounts, new Date(startDate), new Date(endDate));
+        } else {
+            renderDailyActivityGraph(dailyCounts, new Date(startDate), new Date(endDate));
+        }
     }
 
-    // --- 5. Add Event Listeners ---
+    function renderDailyActivityGraph(dailyCounts, startDate, endDate) {
+        const chartContainer = document.getElementById('daily-activity-chart');
+        const yAxisContainer = document.getElementById('y-axis');
+        chartContainer.innerHTML = '';
+        yAxisContainer.innerHTML = '';
+
+        const getNiceMaxValue = (value) => {
+            if (value <= 5) return 5;
+            if (value <= 10) return 10;
+            return Math.ceil(value / 10) * 10;
+        };
+        const maxCount = getNiceMaxValue(Math.max(...Object.values(dailyCounts), 0));
+        yAxisContainer.innerHTML = `<span>${maxCount}</span><span>${Math.round(maxCount / 2)}</span><span>0</span>`;
+
+        let loopDate = new Date(startDate);
+        while (loopDate <= endDate) {
+            const dayKey = getLocalDayKey(loopDate);
+            const count = dailyCounts[dayKey] || 0;
+            const barHeight = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chart-bar-wrapper';
+            const bar = document.createElement('div');
+            bar.className = 'chart-bar';
+            bar.style.height = '0%';
+            setTimeout(() => { bar.style.height = `${barHeight}%`; }, 100);
+            const tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = `${count} tasks`;
+            bar.appendChild(tooltip);
+            const label = document.createElement('span');
+            label.className = 'chart-label';
+            label.textContent = loopDate.toLocaleDateString('en-US', { weekday: 'short' });
+            wrapper.appendChild(bar);
+            wrapper.appendChild(label);
+            chartContainer.appendChild(wrapper);
+
+            loopDate.setDate(loopDate.getDate() + 1);
+        }
+    }
+
+    function renderMonthlyActivityGraph(dailyCounts, startDate, endDate) {
+        const chartContainer = document.getElementById('daily-activity-chart');
+        const yAxisContainer = document.getElementById('y-axis');
+        chartContainer.innerHTML = '';
+        yAxisContainer.innerHTML = '';
+
+        const monthlyCounts = {};
+        for (const dayKey in dailyCounts) {
+            const monthKey = dayKey.substring(0, 7);
+            monthlyCounts[monthKey] = (monthlyCounts[monthKey] || 0) + dailyCounts[dayKey];
+        }
+
+        const getNiceMaxValue = (value) => {
+            if (value <= 10) return 10;
+            if (value <= 50) return 50;
+            return Math.ceil(value / 50) * 50;
+        };
+        const maxCount = getNiceMaxValue(Math.max(...Object.values(monthlyCounts), 0));
+        yAxisContainer.innerHTML = `<span>${maxCount}</span><span>${Math.round(maxCount / 2)}</span><span>0</span>`;
+
+        let loopDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        let finalDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+        while (loopDate <= finalDate) {
+            const monthKey = `${loopDate.getFullYear()}-${(loopDate.getMonth() + 1).toString().padStart(2, '0')}`;
+            const count = monthlyCounts[monthKey] || 0;
+            const barHeight = maxCount > 0 ? (count / maxCount) * 100 : 0;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chart-bar-wrapper';
+            const bar = document.createElement('div');
+            bar.className = 'chart-bar';
+            bar.style.height = '0%';
+            setTimeout(() => { bar.style.height = `${barHeight}%`; }, 100);
+            const tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = `${count} tasks`;
+            bar.appendChild(tooltip);
+            const label = document.createElement('span');
+            label.className = 'chart-label';
+            label.textContent = loopDate.toLocaleDateString('en-US', { month: 'short' });
+            wrapper.appendChild(bar);
+            wrapper.appendChild(label);
+            chartContainer.appendChild(wrapper);
+
+            loopDate.setMonth(loopDate.getMonth() + 1);
+        }
+    }
+
     rangeButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Update active button style
             rangeButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-            // Recalculate analytics for the new range
             updateAnalytics(button.dataset.range);
         });
     });
 
-    // Initial load with the default view
     updateAnalytics('weekly');
+
+    window.addEventListener('storage', (e) => {
+        const key = e.key;
+        if (key && (key.startsWith('completedRecurring-') || key === 'deadlineTasks' || key === 'uniqueTasks')) {
+            const activeButton = document.querySelector('.range-btn.active');
+            const currentRange = activeButton ? activeButton.dataset.range : 'weekly';
+            updateAnalytics(currentRange);
+        }
+    });
 });

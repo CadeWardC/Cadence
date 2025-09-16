@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadence - Sustained Projects</title>
+    <!-- FIX: Add the main stylesheet for base styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sustained.css">
+</head>
+<body>
+    <!-- Standard Menu Button and Side Menu -->
+    <button class="menu-btn">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <nav class="side-menu"></nav>
+    <div class="overlay"></div>
+
+    <div class="container">
+        <h1>Sustained Projects</h1>
+        <p class="subtitle">Manage multiple to-do lists for your long-term goals.</p>
+
+        <!-- Input to Add a New List -->
+        <div class="add-list-wrapper">
+            <input type="text" id="new-list-input" placeholder="Enter new project name...">
+            <button id="add-list-btn">Create New List</button>
+        </div>
+
+        <!-- Container for all the to-do lists -->
+        <div id="lists-container" class="lists-container">
+            <!-- To-do lists will be dynamically added here by JavaScript -->
+        </div>
+
+    </div>
+
+    <!-- Global Modal -->
+    <div id="global-modal" class="global-modal-overlay">
+        <div class="global-modal-content">
+            <h3 id="global-modal-title"></h3>
+            <p id="global-modal-message"></p>
+            <div class="global-modal-buttons">
+                <button id="global-modal-cancel-btn">Cancel</button>
+                <button id="global-modal-confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript files -->
+    <script src="utils.js"></script>
+    <script src="menu.js"></script>
+    <script src="sustained.js"></script>
+</body>
+</html>

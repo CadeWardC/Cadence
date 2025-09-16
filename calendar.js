@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tags = dayTaskTags.value.trim().split(',').map(tag => tag.trim()).filter(tag => tag !== '');
 
         if (!text) {
-            alert('Please enter a task description.');
+            showAlert('Input Required', 'Please enter a task description.');
             return;
         }
 
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveTask() {
         const taskName = taskNameInput.value.trim();
         if (!taskName) {
-            alert('Task name cannot be empty.');
+            showAlert('Input Required', 'Task name cannot be empty.');
             return;
         }
 
@@ -382,13 +382,18 @@ document.addEventListener('DOMContentLoaded', () => {
         let tasks = getTasksForDay(selectedDate);
 
         if (e.target.matches('.delete-btn')) {
-            if (confirm('Are you sure you want to delete this task?')) {
-                deleteTaskFromStorage(taskId);
-                tasks = tasks.filter(task => task.id !== taskId);
-                saveTasksForDay(selectedDate, tasks);
-                renderTasks(selectedDate);
-                renderCalendar(); // Update calendar indicators
-            }
+            showConfirm(
+                'Delete Task',
+                'Are you sure you want to delete this task?',
+                'Delete',
+                () => {
+                    deleteTaskFromStorage(taskId);
+                    tasks = tasks.filter(task => task.id !== taskId);
+                    saveTasksForDay(selectedDate, tasks);
+                    renderTasks(selectedDate);
+                    renderCalendar(); // Update calendar indicators
+                }
+            );
         } else if (e.target.matches('.edit-btn')) {
             const task = tasks.find(t => t.id === taskId);
             if (task) {

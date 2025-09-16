@@ -3,21 +3,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const storageSelect = document.getElementById('storage-select');
     const dropboxSettings = document.getElementById('dropbox-settings');
     const connectionStatusDiv = document.getElementById('dropbox-connection-status');
-    const getCodeBtn = document.getElementById('get-dropbox-code-btn');
-    const codeInput = document.getElementById('dropbox-code-input');
-    const submitCodeBtn = document.getElementById('submit-dropbox-code-btn');
-    const step1Div = document.getElementById('dropbox-step-1');
-    const step2Div = document.getElementById('dropbox-step-2');
-    const authStepsDiv = document.getElementById('dropbox-auth-steps');
     const saveToDropboxBtn = document.getElementById('save-to-dropbox-btn');
     const loadFromDropboxBtn = document.getElementById('load-from-dropbox-btn');
-    const clearDataBtn = document.getElementById('clear-data-btn');
     const exportDataBtn = document.getElementById('export-data-btn');
-    const importDataBtn = document.getElementById('import-data-btn');
-    const importFileInput = document.getElementById('import-file-input');
+    const importDataInput = document.getElementById('import-data-input');
+    const clearDataBtn = document.getElementById('clear-data-btn');
     const modal = document.getElementById('confirmation-modal');
-    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmClearBtn = document.getElementById('confirm-clear-btn');
+    const cancelClearBtn = document.getElementById('cancel-clear-btn');
     const initialView = document.getElementById('confirm-initial-view');
     const successView = document.getElementById('confirm-success-view');
     const autosaveIntervalSelect = document.getElementById('autosave-interval-select');
@@ -46,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadFromDropbox(isRetry = false) {
         let accessToken = localStorage.getItem('dropboxAccessToken');
         if (!accessToken) {
-            alert('Not connected to Dropbox.');
+            showAlert('Connection Error', 'Not connected to Dropbox.');
             return;
         }
         loadFromDropboxBtn.textContent = 'Loading...';
@@ -65,13 +58,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (newAccessToken) {
                     await loadFromDropbox(true); // Correctly retry the operation
                 } else {
-                    alert('Your Dropbox session has expired. Please reconnect.');
+                    showAlert('Session Expired', 'Your Dropbox session has expired. Please reconnect.');
                 }
                 return; // Exit this attempt
             }
 
             if (response.status === 409) {
-                alert('No backup file found in Dropbox.');
+                showAlert('File Not Found', 'No backup file found in Dropbox.');
             } else if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`Dropbox API error: ${response.statusText} - ${errorText}`);
@@ -110,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Failed to load from Dropbox:', error);
-            alert('An error occurred while loading from Dropbox. Check the console for details.');
+            showAlert('Load Error', 'An error occurred while loading from Dropbox. Check the console for details.');
         } finally {
             loadFromDropboxBtn.textContent = 'Load from Dropbox';
             if (!isRetry) loadFromDropboxBtn.disabled = false;
@@ -197,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showConfirmationModal(title, message, confirmText, onConfirm) {
         initialView.querySelector('h3').textContent = title;
         initialView.querySelector('p').textContent = message;
-        confirmDeleteBtn.textContent = confirmText;
+        confirmClearBtn.textContent = confirmText;
         confirmAction = onConfirm; // Store the action to be executed
         
         initialView.classList.remove('hidden');
@@ -213,14 +206,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Single listener for the confirm button
-    confirmDeleteBtn.addEventListener('click', () => {
+    confirmClearBtn.addEventListener('click', () => {
         if (typeof confirmAction === 'function') {
             confirmAction();
             confirmAction = null; // Clear action after execution
         }
     });
 
-    cancelDeleteBtn.addEventListener('click', () => {
+    cancelClearBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
         confirmAction = null; // Clear action on cancel
     });
@@ -252,11 +245,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const codeVerifier = sessionStorage.getItem('dropboxCodeVerifier');
 
         if (!authCode) {
-            alert('Please paste the authorization code from Dropbox.');
+            showAlert('Input Required', 'Please paste the authorization code from Dropbox.');
             return;
         }
         if (!codeVerifier) {
-            alert('An error occurred. Please try generating a new code.');
+            showAlert('Session Error', 'An error occurred. Please try generating a new code.');
             return;
         }
 
@@ -284,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateDropboxUI();
         } catch (error) {
             console.error('Dropbox token exchange error:', error);
-            alert(error.message);
+            showAlert('Authentication Error', error.message);
         } finally {
             submitCodeBtn.textContent = 'Submit Code';
             submitCodeBtn.disabled = false;
@@ -381,13 +374,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // --- Import/Export/Clear Data Logic (Updated to use new modal) ---
-    if (importDataBtn && importFileInput) {
-        importDataBtn.addEventListener('click', () => importFileInput.click());
-        importFileInput.addEventListener('change', (event) => {
+    if (importDataBtn && importDataInput) {
+        importDataBtn.addEventListener('click', () => importDataInput.click());
+        importDataInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file || !file.name.toLowerCase().endsWith('.td')) {
-                alert('Invalid file type. Please select a .td backup file.');
-                importFileInput.value = '';
+                showAlert('Invalid File', 'Invalid file type. Please select a .td backup file.');
+                importDataInput.value = '';
                 return;
             }
             const reader = new FileReader();
@@ -410,64 +403,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     );
                 } catch (error) {
-                    alert('Error: The selected file is not a valid backup file.');
+                    showAlert('Import Error', 'The selected file is not a valid backup file.');
                 } finally {
-                    importFileInput.value = '';
+                    importDataInput.value = ''; // Reset input
                 }
             };
             reader.readAsText(file);
         });
     }
 
-    // --- Data Management Event Listeners ---
-    if (exportDataBtn) {
-        exportDataBtn.addEventListener('click', () => {
-            const dataToExport = {};
-            const sensitiveKeys = ['dropboxAccessToken', 'dropboxRefreshToken', 'pkceCodeVerifier'];
-            
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (!sensitiveKeys.includes(key)) {
-                    let value = localStorage.getItem(key);
-                    try {
-                        // FIX: Attempt to parse the value as JSON. If it's an object or array,
-                        // it will be correctly handled by the final JSON.stringify.
-                        // If it's just a string (like 'storageMethod'), it will throw an error
-                        // and we'll use the original string value.
-                        dataToExport[key] = JSON.parse(value);
-                    } catch (e) {
-                        // The value was not a JSON string, so use it as is.
-                        dataToExport[key] = value;
-                    }
-                }
-            }
-            
-            const jsonString = JSON.stringify(dataToExport, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `todo-app-backup-${new Date().toISOString().slice(0, 10)}.td`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-    }
+    clearDataBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+    });
 
-    if (clearDataBtn && modal) {
-        clearDataBtn.addEventListener('click', () => {
-            showConfirmationModal(
-                'Are you sure?',
-                'This action will permanently delete all your data and cannot be undone.',
-                'Yes, Delete Everything',
-                () => {
-                    localStorage.clear();
-                    showSuccessAndRedirect('All data has been cleared. Redirecting...');
-                }
-            );
-        });
-    }
+    confirmClearBtn.addEventListener('click', () => {
+        localStorage.clear();
+        modal.style.display = 'none';
+        showSuccessAndRedirect('All data has been cleared. Redirecting...');
+    });
+
+    cancelClearBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
 
     // --- Calendar Logic ---
     const calendarEl = document.getElementById('calendar');

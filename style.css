@@ -1229,98 +1229,156 @@ li label {
     }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    /* Make task template lists scroll horizontally on mobile */
-    #suggested-tasks-list,
-    #my-tasks-list {
-        display: flex;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 25px; /* Add more space for the scrollbar */
-    }
-
-    #suggested-tasks-list .task,
-    #my-tasks-list .task {
-        flex: 0 0 110px; /* Give tasks a fixed width so they don't shrink */
-    }
-
-    .task-input-row {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .task-input-row .time-input {
-        width: 100%;
-        padding: 18px 10px; /* Increased vertical padding for mobile */
-    }
-    
-    .task-options-row {
-        flex-direction: column;
-        align-items: flex-start; /* Align items to the start (left) */
-        gap: 10px;
-    }
-
-    .deadline-toggle-container {
-        flex-grow: 0; /* Prevent stretching */
-        justify-content: flex-start;
-        align-self: flex-start; /* Prevent the container from stretching */
-        width: auto; /* Ensure container only takes up content width */
-    }
-    
-    .task-options-row button {
-        width: 100%;
-    }
-
-    .calendar-container {
-        padding: 10px; /* Reduce padding on mobile */
-    }
-
-    .calendar-day {
-        height: auto; /* Allow height to adjust on mobile */
-        min-height: 45px; /* Adjust min-height for mobile */
-        padding: 2px;
-        font-size: 0.8em;
-    }
-
-    .calendar-header {
-        padding: 0 5px; /* Add some horizontal padding */
-    }
-
-    #month-year-display {
-        font-size: 1.2em; /* Smaller font for mobile */
-    }
-
-    .calendar-nav-btn {
-        width: 35px; /* Smaller nav buttons */
-        height: 35px;
-        font-size: 1.2em;
-    }
-
-    .calendar-grid {
-        gap: 2px; /* Tighter grid */
-    }
-
-    .calendar-weekdays {
-        font-size: 0.8em; /* Smaller weekday font */
-    }
-
-    /* Abbreviate weekday names on mobile */
-    .calendar-weekdays .weekday:nth-child(1)::before { content: "S"; }
-    .calendar-weekdays .weekday:nth-child(2)::before { content: "M"; }
-    .calendar-weekdays .weekday:nth-child(3)::before { content: "T"; }
-    .calendar-weekdays .weekday:nth-child(4)::before { content: "W"; }
-    .calendar-weekdays .weekday:nth-child(5)::before { content: "T"; }
-    .calendar-weekdays .weekday:nth-child(6)::before { content: "F"; }
-    .calendar-weekdays .weekday:nth-child(7)::before { content: "S"; }
-
-    .calendar-weekdays .weekday span {
-        display: none; /* Hide original text */
-    }
-
-    .calendar .task {
-        font-size: 0.6em;
-        padding: 1px 2px;
-        margin-top: 1px;
-    }
+/* --- Daily Activity Chart Styles --- */
+.daily-activity-chart-container {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
 }
+
+.daily-activity-chart-container h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.1em;
+    color: #e0e0e0;
+}
+
+.chart-with-axis {
+    display: flex;
+    height: 170px; /* Increased height for labels */
+}
+
+.y-axis {
+    width: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: right;
+    padding-right: 10px;
+    font-size: 0.75em;
+    color: #aaa;
+}
+
+.chart-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 100%; /* Take full height of parent */
+    padding-top: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1); /* Add axis line */
+    flex-grow: 1; /* Take remaining space */
+}
+
+.chart-bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    /* FIX: Remove flex-grow and set a width to prevent flex conflicts. */
+    width: 100%; 
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.chart-bar {
+    width: 60%;
+    max-width: 30px;
+    background-color: var(--accent-color);
+    border-radius: 3px 3px 0 0;
+    transition: height 0.5s ease-out;
+    position: relative;
+    /* FIX: Add a border to ensure the bar is always visible, even if the accent color is dark. */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-bottom: none; /* Don't apply border to the bottom edge */
+}
+
+.chart-bar .tooltip {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.chart-bar:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.chart-label {
+    font-size: 0.75em;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+/* --- End Daily Activity Chart --- */
+
+/* --- Global Modal Styles --- */
+.global-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.global-modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.global-modal-content {
+    background: #3a3a3a;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.global-modal-overlay.visible .global-modal-content {
+    transform: scale(1);
+}
+
+.global-modal-content h3 {
+    margin-top: 0;
+    color: #fff;
+}
+
+.global-modal-content p {
+    color: #ccc;
+    margin-bottom: 25px;
+}
+
+.global-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.global-modal-buttons button {
+    flex-grow: 1;
+    margin-top: 0;
+}
+/* --- End Global Modal Styles --- */

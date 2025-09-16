@@ -1,0 +1,110 @@
+/* --- Sustained Projects Page Styles --- */
+
+.subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-top: -20px;
+    margin-bottom: 30px;
+}
+
+.add-list-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.add-list-wrapper input {
+    flex-grow: 1;
+    margin-top: 0;
+}
+
+.add-list-wrapper button {
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+.lists-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.todo-list {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.todo-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.todo-list-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #e0e0e0;
+}
+
+.todo-list .delete-btn {
+    margin-left: 10px;
+    transform: none;
+}
+
+.todo-list .items-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.todo-list .items-list li {
+    padding: 8px 0;
+    font-size: 1em;
+}
+
+.add-item-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: auto; /* Pushes this to the bottom */
+}
+
+.add-item-wrapper input {
+    flex-grow: 1;
+    margin-top: 0;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.add-item-wrapper button {
+    margin-top: 0;
+    padding: 8px 15px;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.button-like-label {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: filter 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.button-like-label:hover {
+    filter: brightness(1.15);
+}
