@@ -369,16 +369,40 @@ button:hover {
 
 /* --- Recurring Tasks Page Styles --- */
 #weekdays-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 10px; /* Reduced margin */
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 20px;
+    padding: 10px 20px;
+    /* Use negative margin to extend the scroll area to the screen edges */
+    margin: 0 -20px; 
+    /* Smooth snapping effect for mobile */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .weekday-section {
-    /* Flex properties are no longer needed with a grid layout */
+    /* Prevent columns from shrinking and set their width */
+    flex: 0 0 85%;
+    max-width: 350px; /* Set a max-width for larger screens */
+    scroll-snap-align: start; /* Snap to the start of each column */
     display: flex;
     flex-direction: column;
+}
+
+.weekday-section .task-list {
+    flex-grow: 1; /* Ensure the dropzone fills the available space */
+    min-height: 200px; /* Give the dropzone a minimum height */
+}
+
+/* Hide the scrollbar for a cleaner look, but keep it scrollable */
+#weekdays-container::-webkit-scrollbar {
+    display: none;
+}
+
+#weekdays-container {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 .task-list {
