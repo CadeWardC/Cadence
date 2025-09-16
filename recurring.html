@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadence - Routine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button class="menu-btn"><span></span><span></span><span></span></button>
+    <div class="overlay"></div>
+    <nav class="side-menu">
+        <a href="index.html" class="menu-item">Daily Tasks</a>
+        <a href="recurring.html" class="menu-item">Routine</a>
+        <a href="calendar.html" class="menu-item">Calendar</a>
+        <a href="settings.html" class="menu-item">Settings</a>
+    </nav>
+
+    <div class="container">
+        <h1>Manage Routine</h1>
+        <div id="template-trash" class="dropzone">🗑️</div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="my-tasks-panel">My Tasks</button>
+            <button class="tab-btn" data-tab="suggested-tasks-panel">Suggested</button>
+        </div>
+
+        <!-- My Tasks Panel (Default) -->
+        <div id="my-tasks-panel" class="tab-panel active">
+            <div class="add-task-wrapper">
+                <input type="text" id="new-recurring-task-input" placeholder="Create a new task...">
+                <button id="add-recurring-task-btn">+</button>
+            </div>
+            <div id="my-tasks-list" class="task-list dropzone">
+                <!-- User-created tasks will appear here -->
+            </div>
+        </div>
+
+        <!-- Suggested Tasks Panel -->
+        <div id="suggested-tasks-panel" class="tab-panel">
+            <div id="suggested-tasks-list" class="task-list dropzone">
+                <div class="task" draggable="true">Go for a walk</div>
+                <div class="task" draggable="true">Meal prep</div>
+                <div class="task" draggable="true">Clean the kitchen</div>
+                <div class="task" draggable="true">Drink a glass of water</div>
+                <div class="task" draggable="true">Stretch for 10 minutes</div>
+                <div class="task" draggable="true">Meditate for 5 minutes</div>
+                <div class="task" draggable="true">Plan your day</div>
+                <div class="task" draggable="true">Tidy up workspace</div>
+                <div class="task" draggable="true">Read a book</div>
+                <div class="task" draggable="true">Journal for 15 minutes</div>
+                <div class="task" draggable="true">Call a friend or family</div>
+                <div class="task" draggable="true">Prepare a healthy lunch</div>
+                <div class="task" draggable="true">Take vitamins</div>
+                <div class="task" draggable="true">Floss</div>
+            </div>
+        </div>
+
+        <div id="weekdays-container">
+            <!-- Weekday sections -->
+            <div class="weekday-section">
+                <h2>Monday</h2>
+                <div class="task-list dropzone" id="monday"></div>
+            </div>
+            <div class="weekday-section">
+                <h2>Tuesday</h2>
+                <div class="task-list dropzone" id="tuesday"></div>
+            </div>
+            <div class="weekday-section">
+                <h2>Wednesday</h2>
+                <div class="task-list dropzone" id="wednesday"></div>
+            </div>
+            <div class="weekday-section">
+                <h2>Thursday</h2>
+                <div class="task-list dropzone" id="thursday"></div>
+            </div>
+            <div class="weekday-section">
+                <h2>Friday</h2>
+                <div class="task-list dropzone" id="friday"></div>
+            </div>
+            <div class="weekday-section">
+                <h2>Saturday</h2>
+                <div class="task-list dropzone" id="saturday"></div>
+            </div>
+            <div class="weekday-section">
+                <h2>Sunday</h2>
+                <div class="task-list dropzone" id="sunday"></div>
+            </div>
+        </div>
+    </div>
+    <div id="autosave-popup"></div>
+
+    <!-- Global Modal -->
+    <div id="global-modal" class="global-modal-overlay">
+        <div class="global-modal-content">
+            <h3 id="global-modal-title"></h3>
+            <p id="global-modal-message"></p>
+            <div class="global-modal-buttons">
+                <button id="global-modal-cancel-btn">Cancel</button>
+                <button id="global-modal-confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="recurring.js"></script>
+    <script src="autosave.js"></script>
+    <script src="menu.js"></script>
+</body>
+</html>
