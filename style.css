@@ -490,49 +490,105 @@ button:hover {
     display: block;
 }
 
-#suggested-tasks-list,
-#my-tasks-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Reduced min-width */
-    gap: 8px; /* Reduced gap */
-    padding: 8px; /* Reduced padding */
-    background-color: rgba(0,0,0,0.1);
-    border-radius: 8px;
-    min-height: 40px; /* Reduced min-height */
+/* --- Recurring Page: Horizontal Task List Styles --- */
+.horizontal-task-container {
+    background-color: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 30px;
 }
 
-#suggested-tasks-list .task,
-#my-tasks-list .task {
-    background-color: #4a4a4a;
-    border: none;
-    border-radius: 6px; /* Reduced border-radius */
-    padding: 8px 6px; /* Reduced padding */
-    text-align: center;
-    font-size: 0.8em; /* Reduced font size */
-    min-height: 40px; /* Reduced min-height */
-    display: flex;
-    justify-content: center;
+.horizontal-task-container .tab-panel {
+    display: none; /* Hide panels by default */
+}
+
+.horizontal-task-container .tab-panel.active {
+    display: flex; /* Use flexbox for the active panel */
     align-items: center;
-    cursor: grab;
+    overflow-x: auto;
+    padding-bottom: 10px; /* Space for scrollbar */
 }
 
-.add-task-wrapper {
+/* Custom scrollbar for horizontal list */
+.horizontal-task-container .tab-panel.active::-webkit-scrollbar {
+    height: 8px;
+}
+.horizontal-task-container .tab-panel.active::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+.horizontal-task-container .tab-panel.active::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+.horizontal-task-container .tab-panel.active::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+
+.add-task-wrapper-horizontal {
     display: flex;
-    flex-direction: column; /* Stack input and button on mobile */
-    gap: 10px;
-    margin-top: 20px;
+    align-items: center;
+    padding-right: 15px;
+    border-right: 2px solid rgba(255,255,255,0.1);
+    margin-right: 15px;
 }
 
-.add-task-wrapper input {
-    flex-grow: 1;
-    margin-right: 0; /* Remove margin for stacked layout */
-}
-
-.add-task-wrapper button {
-    flex-shrink: 0;
-    width: 100%; /* Full width button on mobile */
+.add-task-wrapper-horizontal input {
+    width: 200px;
     margin-top: 0;
 }
+
+.add-task-wrapper-horizontal button {
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+.task-list-horizontal {
+    display: flex;
+    gap: 10px;
+    min-height: 50px; /* Ensure it's a valid dropzone even when empty */
+}
+
+.task-list-horizontal .task {
+    flex-shrink: 0; /* Prevent tasks from shrinking */
+    white-space: nowrap;
+}
+
+/* Remove old vertical list styles */
+.add-task-wrapper,
+#my-tasks-list,
+#suggested-tasks-list {
+    display: none;
+}
+/* --- End Recurring Page Styles --- */
+
+
+#weekdays-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px 20px;
+    margin: 0 -20px;
+}
+
+.weekday-section {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+}
+
+.weekday-section .task-list {
+    flex-grow: 1;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* --- End Recurring Tasks Page Styles --- */
 
 /* --- Settings Page Styles --- */
 .settings-section {
