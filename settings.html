@@ -24,6 +24,15 @@
         <h1>Settings</h1>
 
         <div class="settings-section">
+            <h2>Appearance</h2>
+            <div class="appearance-setting">
+                <label for="accent-color-picker">Accent Color:</label>
+                <input type="color" id="accent-color-picker">
+                <button id="reset-color-btn" class="inline-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
             <h2>Storage Method</h2>
             <p>Choose where your data is saved. Cloud sync is coming soon.</p>
             <select id="storage-select" class="styled-select">
@@ -31,15 +40,6 @@
                 <option value="dropbox">Dropbox</option>
                 <option value="database" disabled>Database (Coming Soon)</option>
             </select>
-        </div>
-
-        <div class="settings-section">
-            <h2>Appearance</h2>
-            <div class="appearance-setting">
-                <label for="accent-color-picker">Accent Color:</label>
-                <input type="color" id="accent-color-picker">
-                <button id="reset-color-btn" class="inline-btn">Reset</button>
-            </div>
         </div>
 
         <div id="dropbox-settings" class="hidden">
@@ -69,6 +69,8 @@
                     <label for="autosave-interval-select">Autosave Interval:</label>
                     <select id="autosave-interval-select" class="styled-select">
                         <option value="0">None</option>
+                        <option value="30000">Every 30 Seconds</option>
+                        <option value="60000">Every 1 minutes</option>
                         <option value="300000">Every 5 minutes</option>
                         <option value="600000">Every 10 minutes</option>
                         <option value="900000">Every 15 minutes</option>
@@ -127,6 +129,8 @@
         </div>
     </div>
 
+    <!-- FIX: Add the missing utils.js script tag. It must be loaded before other scripts that use its functions. -->
+    <script src="utils.js"></script>
     <script src="menu.js"></script>
     <script src="autosave.js"></script>
     <script src="settings.js"></script>

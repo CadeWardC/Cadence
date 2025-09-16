@@ -25,17 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Dropbox API Functions (moved here for global access) ---
 const DROPBOX_CLIENT_ID = 'q3ra3185xx6ftrd';
 
+// --- Passive Autosave Popup Logic ---
+let popupTimer;
 function showAutosavePopup() {
-    let popup = document.getElementById('autosave-popup');
-    if (!popup) {
-        popup = document.createElement('div');
-        popup.id = 'autosave-popup';
-        document.body.appendChild(popup);
+    const popup = document.getElementById('autosave-popup');
+    if (!popup) return;
+
+    // If a timer is already running, clear it
+    if (popupTimer) {
+        clearTimeout(popupTimer);
     }
+
     popup.textContent = '✅ Autosaved to Dropbox';
-    popup.classList.add('show');
-    setTimeout(() => {
-        popup.classList.remove('show');
+    popup.classList.add('visible');
+
+    // Set a timer to hide the popup after 3 seconds
+    popupTimer = setTimeout(() => {
+        popup.classList.remove('visible');
     }, 3000);
 }
 
@@ -117,52 +123,35 @@ async function saveToDropbox(isAutosave = false, isRetry = false) {
             return;
         }
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Dropbox API error: ${response.statusText} - ${errorText}`);
-        }
-
-        if (!isAutosave) {
-            alert('Data successfully saved to Dropbox.');
+        if (response.ok) {
+            console.log('Save to Dropbox successful.');
+            // FIX: Differentiate between autosave and manual save popups.
+            if (isAutosave) {
+                showAutosavePopup(); // Show the new passive popup
+            } else {
+                showAlert('Save Successful', 'Data successfully saved to Dropbox.'); // Show the existing modal
+            }
         } else {
-            console.log('Autosave to Dropbox successful.');
-            const popup = document.getElementById('autosave-popup');
-            if (popup) {
-                popup.textContent = 'Autosaved to Dropbox!';
-                popup.classList.add('show');
-                setTimeout(() => popup.classList.remove('show'), 3000);
+            const errorData = await response.json();
+            console.error('Failed to save to Dropbox:', errorData);
+            if (!isAutosave) {
+                // FIX: Replaced the native alert with the custom in-app modal.
+                showAlert('Save Failed', 'Could not save data to Dropbox. Check console for details.', 'error');
             }
         }
-
     } catch (error) {
-        console.error('Failed to save to Dropbox:', error);
+        console.error('An error occurred during saveToDropbox:', error);
         if (!isAutosave) {
-            alert('An error occurred while saving to Dropbox. Check the console for details.');
+            // FIX: Replaced the native alert with the custom in-app modal.
+            showAlert('Save Error', 'An unexpected error occurred. Check console for details.', 'error');
         }
-    }
-}
-
-async function refreshDropboxToken() {
-    const refreshToken = localStorage.getItem('dropboxRefreshToken');
-    if (!refreshToken) return null;
-    try {
-        const response = await fetch('https://api.dropboxapi.com/oauth2/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ 'grant_type': 'refresh_token', 'refresh_token': refreshToken, 'client_id': DROPBOX_CLIENT_ID, }),
-        });
-        if (!response.ok) throw new Error('Failed to refresh token.');
-        const data = await response.json();
-        localStorage.setItem('dropboxAccessToken', data.access_token);
-        return data.access_token;
-    } catch (error) {
-        console.error('Dropbox token refresh error:', error);
-        localStorage.removeItem('dropboxAccessToken');
-        localStorage.removeItem('dropboxRefreshToken');
-        // If on settings page, update UI. Otherwise, just fail silently.
-        if (typeof updateDropboxUI === 'function') {
-            updateDropboxUI();
+    } finally {
+        if (!isAutosave) {
+            const saveBtn = document.getElementById('save-to-dropbox-btn');
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save to Dropbox';
+            }
         }
-        return null;
     }
 }

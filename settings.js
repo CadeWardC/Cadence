@@ -6,17 +6,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveToDropboxBtn = document.getElementById('save-to-dropbox-btn');
     const loadFromDropboxBtn = document.getElementById('load-from-dropbox-btn');
     const exportDataBtn = document.getElementById('export-data-btn');
-    const importDataInput = document.getElementById('import-data-input');
+    const importDataBtn = document.getElementById('import-data-btn'); // Added selector for the button
+    const importDataInput = document.getElementById('import-file-input'); // Corrected ID from HTML
     const clearDataBtn = document.getElementById('clear-data-btn');
     const modal = document.getElementById('confirmation-modal');
-    const confirmClearBtn = document.getElementById('confirm-clear-btn');
-    const cancelClearBtn = document.getElementById('cancel-clear-btn');
+    const confirmClearBtn = document.getElementById('confirm-delete-btn'); // Corrected ID from HTML
+    const cancelClearBtn = document.getElementById('cancel-delete-btn'); // Corrected ID from HTML
     const initialView = document.getElementById('confirm-initial-view');
     const successView = document.getElementById('confirm-success-view');
     const autosaveIntervalSelect = document.getElementById('autosave-interval-select');
     const autosaveStatus = document.getElementById('autosave-status');
     const accentColorPicker = document.getElementById('accent-color-picker');
     const resetColorBtn = document.getElementById('reset-color-btn');
+    // FIX: Added missing selectors for Dropbox authentication elements. This prevents the script from crashing.
+    const authStepsDiv = document.getElementById('dropbox-auth-steps');
+    const step1Div = document.getElementById('dropbox-step-1');
+    const step2Div = document.getElementById('dropbox-step-2');
+    const getCodeBtn = document.getElementById('get-dropbox-code-btn');
+    const codeInput = document.getElementById('dropbox-code-input');
+    const submitCodeBtn = document.getElementById('submit-dropbox-code-btn');
+
 
     // --- Dropbox OAuth 2 PKCE Constants & Functions ---
     const DROPBOX_CLIENT_ID = 'q3ra3185xx6ftrd';
@@ -296,8 +305,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (selectedMethod !== 'dropbox') {
             localStorage.removeItem('dropboxAccessToken');
             localStorage.removeItem('dropboxRefreshToken');
-            updateDropboxUI();
         }
+        // FIX: Explicitly update the Dropbox UI state when the selection changes.
+        updateDropboxUI();
         // When storage method changes, check if we need to start/stop autosave
         setupAutosaveAndStatus();
     });
@@ -309,50 +319,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Initialization ---
     function initializeSettingsPage() {
-        // FIX: This logic is being rewritten to reliably find and reorder the main section containers.
-        try {
-            const parentContainer = document.querySelector('.container');
-            if (!parentContainer) throw new Error("Main '.container' not found.");
-
-            // Helper function to find the main section container for an element.
-            // This assumes the section is a direct child of the main '.container'.
-            const findSectionContainer = (elementId) => {
-                const el = document.getElementById(elementId);
-                let parent = el ? el.parentElement : null;
-                while (parent && parent.parentElement !== parentContainer) {
-                    parent = parent.parentElement;
-                }
-                return parent;
-            };
-
-            // Get references to each section's wrapper element.
-            const storageSection = findSectionContainer('storage-select');
-            const dropboxSection = document.getElementById('dropbox-settings'); // This ID is on the section itself.
-            const appearanceSection = findSectionContainer('accent-color-picker');
-            const dataManagementSection = findSectionContainer('export-data-btn');
-            const dangerZoneSection = findSectionContainer('clear-data-btn');
-
-            // Define the correct order.
-            const sectionsInOrder = [
-                storageSection,
-                dropboxSection,
-                appearanceSection,
-                dataManagementSection,
-                dangerZoneSection
-            ];
-
-            // Append each section in the correct order. `appendChild` moves existing elements.
-            sectionsInOrder.forEach(section => {
-                if (section) {
-                    parentContainer.appendChild(section);
-                } else {
-                    console.warn("A settings section could not be found for reordering.");
-                }
-            });
-        } catch (error) {
-            console.error("Failed to reorder settings page layout:", error);
-        }
-
+        // REMOVED: The complex and faulty section-reordering logic has been removed.
+        // The layout should be defined directly in the HTML file for reliability.
 
         // Set initial values from localStorage
         const savedMethod = localStorage.getItem('storageMethod') || 'local';
@@ -374,29 +342,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // --- Import/Export/Clear Data Logic (Updated to use new modal) ---
-    if (importDataBtn && importDataInput) {
-        importDataBtn.addEventListener('click', () => importDataInput.click());
+
+    // FIX: Added listener to make the button trigger the hidden file input.
+    if (importDataBtn) {
+        importDataBtn.addEventListener('click', () => {
+            importDataInput.click();
+        });
+    }
+
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', () => {
+            // FIX: Implemented the full export logic.
+            const dataToExport = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                dataToExport[key] = localStorage.getItem(key);
+            }
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cadence_backup.td';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showAlert('Export Successful', 'Your data has been exported to cadence_backup.td.');
+        });
+    }
+
+    // FIX: Implemented the full import logic.
+    if (importDataInput) {
         importDataInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
-            if (!file || !file.name.toLowerCase().endsWith('.td')) {
-                showAlert('Invalid File', 'Invalid file type. Please select a .td backup file.');
-                importDataInput.value = '';
+            if (!file) {
                 return;
             }
+
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 try {
                     const importedData = JSON.parse(e.target.result);
+                    // Use the confirmation modal before proceeding
                     showConfirmationModal(
                         'Confirm Import',
                         'This will overwrite all current data with the contents of the backup file. This cannot be undone.',
                         'Yes, Overwrite and Import',
                         () => {
+                            // This code runs only if the user confirms
                             localStorage.clear();
                             for (const key in importedData) {
                                 if (Object.hasOwnProperty.call(importedData, key)) {
-                                    const value = importedData[key];
-                                    localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
+                                    localStorage.setItem(key, importedData[key]);
                                 }
                             }
                             showSuccessAndRedirect('Data successfully imported. Redirecting...');
@@ -405,25 +403,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } catch (error) {
                     showAlert('Import Error', 'The selected file is not a valid backup file.');
                 } finally {
-                    importDataInput.value = ''; // Reset input
+                    // Reset the input so the user can select the same file again
+                    event.target.value = '';
                 }
             };
             reader.readAsText(file);
         });
     }
 
+    // FIX: Reverted to use the original, dedicated modal for clearing data.
     clearDataBtn.addEventListener('click', () => {
-        modal.style.display = 'block';
+        initialView.querySelector('h3').textContent = 'Confirm Clear Data';
+        initialView.querySelector('p').textContent = 'This will permanently delete all tasks, settings, and connection tokens. This cannot be undone.';
+        confirmClearBtn.textContent = 'Yes, Delete Everything';
+        
+        initialView.classList.remove('hidden');
+        successView.classList.add('hidden');
+        modal.classList.remove('hidden');
     });
 
+    // This listener now correctly corresponds to the clearDataBtn action.
     confirmClearBtn.addEventListener('click', () => {
-        localStorage.clear();
-        modal.style.display = 'none';
-        showSuccessAndRedirect('All data has been cleared. Redirecting...');
-    });
-
-    cancelClearBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
+        // Check if the modal is for clearing data by checking the button text
+        if (confirmClearBtn.textContent === 'Yes, Delete Everything') {
+            localStorage.clear();
+            showSuccessAndRedirect('All data has been cleared. Redirecting...');
+        } else if (typeof confirmAction === 'function') {
+            // This handles the other modal uses (like Dropbox load)
+            confirmAction();
+            confirmAction = null; // Clear action after execution
+        }
     });
 
 
