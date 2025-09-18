@@ -1468,13 +1468,14 @@ li label {
         display: flex;
         flex-direction: row;
         gap: 10px;
-        /* FIX: Increased the minimum height for a larger touch area. */
-        min-height: 70px;
+        /* FIX: Increased min-height to make the container taller. */
+        min-height: 90px;
         flex-grow: 1;
-        /* FIX: Added some vertical padding to give tasks more space. */
-        padding: 10px 0;
+        /* FIX: Increased top and bottom padding to create more vertical space. */
+        padding: 15px 0;
         overflow-x: auto;
-        padding-bottom: 10px; /* Space for scrollbar */
+        /* FIX: Significantly increased bottom padding to create a dedicated scroll area below the tasks. */
+        padding-bottom: 40px;
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
