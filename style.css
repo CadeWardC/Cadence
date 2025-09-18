@@ -438,7 +438,8 @@ button:hover {
 .tabs {
     display: flex;
     border-bottom: 2px solid #444;
-    margin-bottom: 20px;
+    /* FIX: Reduced the bottom margin to bring it closer to the panel below. */
+    margin-bottom: 15px;
 }
 
 .tab-btn {
@@ -1432,7 +1433,8 @@ li label {
         padding: 15px;
         background-color: rgba(0,0,0,0.2);
         border-radius: 10px;
-        margin-bottom: 20px;
+        /* FIX: Reduced the bottom margin to bring the panel closer to the weekdays below. */
+        margin-bottom: 10px;
     }
 
     #my-tasks-panel.active {
