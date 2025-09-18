@@ -1415,6 +1415,16 @@ li label {
 
 /* --- Responsive Styles for Recurring Page (Mobile) --- */
 @media (max-width: 768px) {
+    /* FIX: Reposition the trash can for mobile layout */
+    #template-trash {
+        position: absolute;
+        top: 105px; /* Align vertically with the tabs */
+        right: 15px;
+        width: 40px; /* Make it slightly smaller for mobile */
+        height: 40px;
+        font-size: 20px;
+    }
+
     /* On mobile, the panels become containers for the horizontal lists */
     #my-tasks-panel,
     #suggested-tasks-panel {
