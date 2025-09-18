@@ -78,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const recurringTasksData = JSON.parse(localStorage.getItem('recurringTasks')) || {};
         const uniqueTasks = JSON.parse(localStorage.getItem('uniqueTasks')) || {};
         const deadlineTasks = JSON.parse(localStorage.getItem('deadlineTasks')) || {};
+        // FIX: Load sustained tasks data.
+        const sustainedTasks = JSON.parse(localStorage.getItem('sustainedTasks')) || {};
 
         let loopDate = new Date(startDate);
         while (loopDate <= endDate) {
@@ -98,6 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 3. Count completed deadline tasks for this day
             Object.values(deadlineTasks).forEach(task => {
+                if (task.completed && task.completionDate === dayKey) {
+                    tasksCompletedOnThisDay++;
+                }
+            });
+
+            // FIX: 4. Count completed sustained tasks for this day.
+            Object.values(sustainedTasks).forEach(task => {
                 if (task.completed && task.completionDate === dayKey) {
                     tasksCompletedOnThisDay++;
                 }
@@ -254,7 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('storage', (e) => {
         const key = e.key;
-        if (key && (key.startsWith('completedRecurring-') || key === 'deadlineTasks' || key === 'uniqueTasks')) {
+        // FIX: Add 'sustainedTasks' to the condition to trigger updates.
+        if (key && (key.startsWith('completedRecurring-') || key === 'deadlineTasks' || key === 'uniqueTasks' || key === 'sustainedTasks')) {
             const activeButton = document.querySelector('.range-btn.active');
             const currentRange = activeButton ? activeButton.dataset.range : 'weekly';
             updateAnalytics(currentRange);
