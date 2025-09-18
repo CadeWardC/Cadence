@@ -1458,9 +1458,11 @@ li label {
         display: flex;
         flex-direction: row;
         gap: 10px;
-        min-height: 50px;
+        /* FIX: Increased the minimum height for a larger touch area. */
+        min-height: 70px;
         flex-grow: 1;
-        padding: 0;
+        /* FIX: Added some vertical padding to give tasks more space. */
+        padding: 10px 0;
         overflow-x: auto;
         padding-bottom: 10px; /* Space for scrollbar */
         -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
@@ -1488,5 +1490,9 @@ li label {
         flex-shrink: 0;
         white-space: nowrap;
         margin-bottom: 0; /* Override default margin */
+        /* FIX: Increased padding and font size to make tasks larger and more readable. */
+        padding: 12px 15px;
+        font-size: 1em;
+        min-height: 50px;
     }
 }
