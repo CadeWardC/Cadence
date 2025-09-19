@@ -139,6 +139,50 @@
         min-height: 40px;
     }
 
+    /* --- NEW: Collapsible Day Sections for Recurring Tasks --- */
+
+    /* Style for the day column container */
+    .day-column {
+        border: 1px solid #444;
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.05);
+        transition: background-color 0.2s ease-in-out, padding-bottom 0.3s ease-out;
+        padding: 10px;
+        cursor: pointer; /* Indicates it's tappable */
+    }
+
+    /* Style for the title within the day column */
+    .day-column .day-title {
+        margin: 0;
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+
+    /* Hide the task drop area by default */
+    .day-column .day-tasks {
+        max-height: 0;
+        overflow: hidden;
+        padding-top: 0;
+        margin-top: 0;
+        transition: max-height 0.3s ease-in-out, margin-top 0.3s ease-in-out, padding-top 0.3s ease-in-out;
+        min-height: 0; /* Ensure it can collapse fully */
+    }
+
+    /* Expand the drop area when the column is open or being dragged over */
+    .day-column.is-open .day-tasks,
+    .day-column.drag-over .day-tasks {
+        max-height: 500px; /* Set a large enough height to show content */
+        margin-top: 10px;
+        padding-top: 10px; /* Add space between title and tasks */
+    }
+
+    /* Visually indicate when a task is being dragged over a day */
+    .day-column.drag-over {
+        background-color: rgba(var(--accent-color-rgb), 0.2);
+        border-color: rgba(var(--accent-color-rgb), 0.7);
+    }
+
+
     /* Settings Page: Stack all controls for easy tapping */
     .settings-section {
         display: flex;
