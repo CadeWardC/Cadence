@@ -271,39 +271,35 @@ document.addEventListener('DOMContentLoaded', () => {
         addTouchListeners(task);
     });
 
-    // --- NEW: Mobile Collapsible Day Sections & Drag-Over Fix ---
+    // --- NEW: Mobile Collapsible Day Sections & Drag-Over ---
     document.querySelectorAll('.day-column').forEach(column => {
-        // 1. Make the section collapsible on mobile
+        // 1. Make the section collapsible on mobile via click/tap
         column.addEventListener('click', (e) => {
-            // We only want to toggle if the header area is clicked, not a task inside.
-            if (e.target.classList.contains('day-title') || e.target === column) {
+            // Only toggle if the click is on the column itself or its title, not a task.
+            if (e.target.classList.contains('day-title') || e.target.classList.contains('day-column')) {
+                // This behavior should only apply on mobile screen sizes.
                 if (window.innerWidth <= 768) {
                     column.classList.toggle('is-open');
                 }
             }
         });
 
-        // 2. Fix drag-over to expand the section
+        // 2. Expand the section when a task is dragged over it
         const dropzone = column.querySelector('.dropzone');
         if (dropzone) {
-            // When a drag enters the dropzone, add 'drag-over' to the parent column
-            dropzone.addEventListener('dragover', () => {
-                if (!column.classList.contains('drag-over')) {
-                    column.classList.add('drag-over');
-                }
-            });
-            // When a drag leaves the dropzone, remove 'drag-over' from the parent
-            dropzone.addEventListener('dragleave', () => {
-                column.classList.remove('drag-over');
-            });
-            // When a drop occurs, also remove the 'drag-over' style
-            dropzone.addEventListener('drop', () => {
-                column.classList.remove('drag-over');
-                // If on mobile, leave the section open after a drop
-                if (window.innerWidth <= 768 && !column.classList.contains('is-open')) {
-                    column.classList.add('is-open');
-                }
-            });
+            const addDragOver = () => column.classList.add('drag-over');
+            const removeDragOver = () => column.classList.remove('drag-over');
+
+            // Handle mouse and touch drag-over
+            dropzone.addEventListener('dragenter', addDragOver);
+            dropzone.addEventListener('dragleave', removeDragOver);
+            dropzone.addEventListener('drop', removeDragOver);
+
+            // Custom event for touch drag-over (you would need to dispatch this from your touch logic)
+            // For now, the CSS handles the visual, and the JS handles the click.
+            // The drag-over for touch is more complex and is handled by your existing touch listeners
+            // which find the element under the finger. We just need to ensure they add the 'drag-over' class
+            // to the `.day-column` instead of (or in addition to) the `.dropzone`.
         }
     });
 
