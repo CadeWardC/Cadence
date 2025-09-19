@@ -1,0 +1,92 @@
+/* --- Mobile-specific styles for screens 768px and narrower --- */
+
+/* --- Analytics Page Mobile Styles --- */
+@media (max-width: 768px) {
+    .analytics-controls {
+        /* Allow the buttons to wrap onto the next line if they don't fit. */
+        flex-wrap: wrap;
+        /* Add a small gap between rows when they wrap. */
+        row-gap: 10px;
+    }
+
+    .chart-area {
+        /* Allow the chart to scroll horizontally if it has too many bars. */
+        overflow-x: auto;
+        /* Ensure the bars are aligned to the start, not spread out, when scrolling. */
+        justify-content: flex-start;
+        padding-bottom: 10px; /* Add space for the scrollbar */
+    }
+
+    .chart-bar-wrapper {
+        /* Give each bar a fixed width so they don't get squished. */
+        flex: 0 0 35px;
+    }
+}
+
+
+/* --- Recurring Page Mobile Styles --- */
+@media (max-width: 768px) {
+    /* Reposition the trash can for mobile layout */
+    #template-trash {
+        position: absolute;
+        top: 105px; /* Align vertically with the tabs */
+        right: 15px;
+        width: 40px; /* Make it slightly smaller for mobile */
+        height: 40px;
+        font-size: 20px;
+    }
+
+    /* On mobile, the panels become containers for the horizontal lists */
+    #my-tasks-panel,
+    #suggested-tasks-panel {
+        display: none; /* Keep tab functionality */
+        padding: 15px;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    #my-tasks-panel.active {
+        /* Use a column layout to separate the input from the list */
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Make the task lists horizontal and scrollable */
+    #my-tasks-list,
+    #suggested-tasks-list {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        min-height: 120px;
+        flex-grow: 1;
+        padding: 15px 0;
+        overflow-x: auto;
+        padding-bottom: 60px;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    /* Style the scrollbar for a cleaner look */
+    #my-tasks-list::-webkit-scrollbar,
+    #suggested-tasks-list::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    #my-tasks-list::-webkit-scrollbar-thumb,
+    #suggested-tasks-list::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 4px;
+    }
+
+    /* Ensure tasks don't shrink or wrap */
+    #my-tasks-list .task,
+    #suggested-tasks-list .task {
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin-bottom: 0; /* Override default margin */
+        padding: 12px 15px;
+        font-size: 1em;
+        min-height: 50px;
+    }
+}

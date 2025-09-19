@@ -1230,28 +1230,8 @@ li label {
     }
 }
 
-/* FIX: Add a new media query specifically for mobile analytics layout fixes. */
-@media (max-width: 768px) {
-    .analytics-controls {
-        /* Allow the buttons to wrap onto the next line if they don't fit. */
-        flex-wrap: wrap;
-        /* Add a small gap between rows when they wrap. */
-        row-gap: 10px;
-    }
+/* FIX: The mobile-specific media query for analytics has been moved to mobile.css */
 
-    .chart-area {
-        /* Allow the chart to scroll horizontally if it has too many bars. */
-        overflow-x: auto;
-        /* Ensure the bars are aligned to the start, not spread out, when scrolling. */
-        justify-content: flex-start;
-        padding-bottom: 10px; /* Add space for the scrollbar */
-    }
-
-    .chart-bar-wrapper {
-        /* Give each bar a fixed width so they don't get squished. */
-        flex: 0 0 35px;
-    }
-}
 
 /* --- Daily Activity Chart Styles --- */
 .daily-activity-chart-container {
@@ -1433,102 +1413,5 @@ li label {
 }
 /* --- End Autosave Notification Popup --- */
 
-.modal-overlay {
-    position: fixed;
-}
 
-/* --- Responsive Styles for Recurring Page (Mobile) --- */
-@media (max-width: 768px) {
-    /* FIX: Reposition the trash can for mobile layout */
-    #template-trash {
-        position: absolute;
-        top: 105px; /* Align vertically with the tabs */
-        right: 15px;
-        width: 40px; /* Make it slightly smaller for mobile */
-        height: 40px;
-        font-size: 20px;
-    }
-
-    /* On mobile, the panels become containers for the horizontal lists */
-    #my-tasks-panel,
-    #suggested-tasks-panel {
-        display: none; /* Keep tab functionality */
-        padding: 15px;
-        background-color: rgba(0,0,0,0.2);
-        border-radius: 10px;
-        /* FIX: Reduced the bottom margin to bring the panel closer to the weekdays below. */
-        margin-bottom: 10px;
-    }
-
-    #my-tasks-panel.active {
-        /* FIX: Use a column layout to separate the input from the list */
-        display: flex;
-        flex-direction: column;
-    }
-
-    #suggested-tasks-panel.active {
-        display: block;
-    }
-
-    /* Adjust the 'Add Task' input area */
-    .add-task-wrapper {
-        display: flex;
-        width: 100%;
-        margin-bottom: 15px; /* Add space between input and list */
-    }
-
-    .add-task-wrapper input {
-        flex-grow: 1;
-        margin-top: 0;
-    }
-
-    .add-task-wrapper button {
-        margin-top: 0;
-        flex-shrink: 0;
-    }
-
-    /* Make the task lists horizontal and scrollable */
-    #my-tasks-list,
-    #suggested-tasks-list {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        /* FIX: Increased min-height to make the container taller. */
-        min-height: 90px;
-        flex-grow: 1;
-        /* FIX: Increased top and bottom padding to create more vertical space. */
-        padding: 15px 0;
-        overflow-x: auto;
-        /* FIX: Significantly increased bottom padding to create a dedicated scroll area below the tasks. */
-        padding-bottom: 40px;
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    }
-
-    /* Style the scrollbar for a cleaner look */
-    #my-tasks-list::-webkit-scrollbar,
-    #suggested-tasks-list::-webkit-scrollbar {
-        height: 8px;
-    }
-    #my-tasks-list::-webkit-scrollbar-track,
-    #suggested-tasks-list::-webkit-scrollbar-track {
-        background: rgba(0,0,0,0.1);
-        border-radius: 4px;
-    }
-    #my-tasks-list::-webkit-scrollbar-thumb,
-    #suggested-tasks-list::-webkit-scrollbar-thumb {
-        background: #555;
-        border-radius: 4px;
-    }
-
-    /* Ensure tasks don't shrink or wrap */
-    #my-tasks-list .task,
-    #suggested-tasks-list .task {
-        flex-shrink: 0;
-        white-space: nowrap;
-        margin-bottom: 0; /* Override default margin */
-        /* FIX: Increased padding and font size to make tasks larger and more readable. */
-        padding: 12px 15px;
-        font-size: 1em;
-        min-height: 50px;
-    }
-}
+/* FIX: The mobile-specific media query for the recurring page has been moved to mobile.css */
