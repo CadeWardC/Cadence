@@ -1,140 +1,151 @@
-/* ==========================================================================
-   Mobile-Friendly Stylesheet
-   - All styles are wrapped in a media query for screens 768px and narrower.
-   ========================================================================== */
+/* --- Mobile-specific styles for screens 768px and narrower --- */
 
+/* --- Global Mobile-Friendly Styles for screens 768px and narrower --- */
 @media (max-width: 768px) {
 
-    /* ======================================================================
-       1. Global Resets & Mobile Enhancements
-       ====================================================================== */
+    /* --- 1. Global Resets for a Native App Feel --- */
 
+    /* Universal box-sizing and tap highlight removal */
     * {
         -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS/Android */
     }
 
-    .menu-btn, .tab-btn, .range-btn, button, .stat-item, .task {
+    /* Prevent accidental text selection on UI elements */
+    .menu-btn, .tab-btn, .range-btn, button, .stat-item {
         -webkit-touch-callout: none; /* Disable callout sheet on long press */
         -webkit-user-select: none;   /* Disable text selection */
+        -moz-user-select: none;
+        -ms-user-select: none;
         user-select: none;
     }
 
-    input, textarea, select {
-        font-size: 16px !important; /* A font-size of 16px+ prevents iOS auto-zoom */
+    /* Prevent iOS from auto-zooming on input fields */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    select {
+        font-size: 16px; /* A font-size of 16px+ prevents auto-zoom */
     }
 
+    /* General container padding for more breathing room */
     .container {
         padding: 15px;
     }
 
-    h1 { font-size: 2em; }
-    h2 { font-size: 1.5em; }
+    h1 {
+        font-size: 2em;
+    }
 
-    /* ======================================================================
-       2. Page-Specific Layouts
-       ====================================================================== */
+    h2 {
+        font-size: 1.5em;
+    }
 
-    /* --- Home Page --- */
+
+    /* --- 2. Page-Specific Layouts --- */
+
+    /* Home Page: Stack the grid into a single column */
     .home-grid {
         grid-template-columns: 1fr;
         gap: 15px;
     }
 
-    /* --- Analytics Page --- */
+    /* Analytics Page: Wrap controls and make chart scrollable */
     .analytics-controls {
         flex-wrap: wrap;
         row-gap: 10px;
     }
+
     .chart-area {
         overflow-x: auto;
         justify-content: flex-start;
         padding-bottom: 10px;
     }
+
     .chart-bar-wrapper {
         flex: 0 0 35px;
     }
 
-    /* --- Calendar Page --- */
-    .calendar-container {
-        flex-direction: column;
-    }
-    .calendar-grid {
-        flex-grow: 0;
-        margin-bottom: 15px;
-    }
-    .calendar-tasks {
-        flex-grow: 1;
-        max-height: none;
+    /* Recurring Page: Horizontal scrolling task lists */
+    #template-trash {
+        position: absolute;
+        top: 105px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
     }
 
-    /* --- Recurring Tasks Page (NEW Split-Screen Layout) --- */
-    #recurring-tasks-container {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 100px); /* Full height minus header/padding */
-    }
-    .tabs {
-        position: relative;
-        margin-bottom: 10px;
-        flex-shrink: 0;
-    }
-    .split-view-wrapper {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        flex-grow: 1;
-        overflow: hidden;
-    }
-    #task-source-panels {
-        flex: 0 0 120px;
-        overflow-y: auto;
-        padding-right: 5px;
-    }
-    #weekdays-container {
-        flex: 1;
-        overflow-y: auto;
-        padding-right: 5px;
-    }
     #my-tasks-panel,
     #suggested-tasks-panel {
         display: none;
-        padding: 0;
-        background-color: transparent;
+        /* FIX: Reduced padding to make the panel shorter. */
+        padding: 10px;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 10px;
+        margin-bottom: 10px;
     }
-    #my-tasks-panel.active,
-    #suggested-tasks-panel.active {
+
+    #my-tasks-panel.active {
         display: flex;
         flex-direction: column;
         gap: 10px;
     }
+
+    /* FIX: Add the missing rule to show the suggested tasks panel when it is active. */
+    #suggested-tasks-panel.active {
+        display: block;
+    }
+
+    /* Make the task lists horizontal and scrollable */
     #my-tasks-list,
     #suggested-tasks-list {
         display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    #my-tasks-list .task,
-    #suggested-tasks-list .task {
-        font-size: 0.9em;
-        padding: 10px 8px;
-        white-space: normal;
-        cursor: grab;
-    }
-    .weekday-column {
-        margin-bottom: 10px;
-    }
-    #template-trash {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 0;
+        flex-direction: row;
+        gap: 10px;
+        /* FIX: Removed the fixed min-height to allow the container to shrink when empty. */
+        min-height: auto;
+        flex-grow: 1;
+        /* FIX: Adjusted padding to provide a small base height when empty, but allow it to grow. */
+        padding: 10px 0;
+        overflow-x: auto;
+        padding-bottom: 20px;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* --- Settings Page --- */
+    #my-tasks-list::-webkit-scrollbar,
+    #suggested-tasks-list::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    #my-tasks-list::-webkit-scrollbar-thumb,
+    #suggested-tasks-list::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 4px;
+    }
+
+    #my-tasks-list .task,
+    #suggested-tasks-list .task {
+        flex-shrink: 0;
+        white-space: nowrap;
+        margin-bottom: 0;
+        /* FIX: Reduced padding and min-height to make individual tasks smaller. */
+        padding: 10px 12px;
+        font-size: 0.9em;
+        min-height: 40px;
+    }
+
+    /* Settings Page: Stack all controls for easy tapping */
     .settings-section {
+        display: flex;
         flex-direction: column;
         gap: 15px;
     }
+
     .settings-section label,
     .settings-section .styled-select,
     .settings-section button,
@@ -142,12 +153,14 @@
         width: 100%;
         box-sizing: border-box;
     }
+
     .appearance-setting {
+        display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    /* --- Sustained Projects Page --- */
+    /* Sustained Projects Page: Stack projects into a list */
     .projects-container {
         grid-template-columns: 1fr;
         gap: 15px;
