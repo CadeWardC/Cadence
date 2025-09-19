@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dragTouch = e.touches[0];
             clone.style.left = `${dragTouch.clientX - (clone.offsetWidth / 2)}px`;
             clone.style.top = `${dragTouch.clientY - (clone.offsetHeight / 2)}px`;
-
+            
             // Highlight dropzone based on the first finger's position
             const elementUnder = document.elementFromPoint(dragTouch.clientX, dragTouch.clientY);
             const dropzone = elementUnder ? elementUnder.closest('.dropzone') : null;
@@ -269,6 +269,42 @@ document.addEventListener('DOMContentLoaded', () => {
         task.appendChild(label);
         addDragListeners(task);
         addTouchListeners(task);
+    });
+
+    // --- NEW: Mobile Collapsible Day Sections & Drag-Over Fix ---
+    document.querySelectorAll('.day-column').forEach(column => {
+        // 1. Make the section collapsible on mobile
+        column.addEventListener('click', (e) => {
+            // We only want to toggle if the header area is clicked, not a task inside.
+            if (e.target.classList.contains('day-title') || e.target === column) {
+                if (window.innerWidth <= 768) {
+                    column.classList.toggle('is-open');
+                }
+            }
+        });
+
+        // 2. Fix drag-over to expand the section
+        const dropzone = column.querySelector('.dropzone');
+        if (dropzone) {
+            // When a drag enters the dropzone, add 'drag-over' to the parent column
+            dropzone.addEventListener('dragover', () => {
+                if (!column.classList.contains('drag-over')) {
+                    column.classList.add('drag-over');
+                }
+            });
+            // When a drag leaves the dropzone, remove 'drag-over' from the parent
+            dropzone.addEventListener('dragleave', () => {
+                column.classList.remove('drag-over');
+            });
+            // When a drop occurs, also remove the 'drag-over' style
+            dropzone.addEventListener('drop', () => {
+                column.classList.remove('drag-over');
+                // If on mobile, leave the section open after a drop
+                if (window.innerWidth <= 768 && !column.classList.contains('is-open')) {
+                    column.classList.add('is-open');
+                }
+            });
+        }
     });
 
     loadState();
