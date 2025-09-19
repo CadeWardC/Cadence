@@ -83,17 +83,16 @@
     #my-tasks-panel,
     #suggested-tasks-panel {
         display: none;
-        padding: 15px;
+        /* FIX: Reduced padding to make the panel shorter. */
+        padding: 10px;
         background-color: rgba(0,0,0,0.2);
         border-radius: 10px;
-        /* FIX: Reduced bottom margin to tighten the layout. */
         margin-bottom: 10px;
     }
 
     #my-tasks-panel.active {
         display: flex;
         flex-direction: column;
-        /* FIX: Reduced the gap to save vertical space. */
         gap: 10px;
     }
 
@@ -108,14 +107,14 @@
         display: flex;
         flex-direction: row;
         gap: 10px;
-        /* FIX: Reduced min-height to make the container shorter. */
-        min-height: 80px;
+        /* FIX: Significantly reduced min-height to shorten the container. */
+        min-height: 65px;
         flex-grow: 1;
         /* FIX: Reduced vertical padding. */
-        padding: 10px 0;
+        padding: 5px 0;
         overflow-x: auto;
-        /* FIX: Reduced bottom padding to reclaim significant vertical space. */
-        padding-bottom: 25px;
+        /* FIX: Reduced bottom padding to reclaim more vertical space. */
+        padding-bottom: 20px;
         -webkit-overflow-scrolling: touch;
     }
 
@@ -135,9 +134,10 @@
         flex-shrink: 0;
         white-space: nowrap;
         margin-bottom: 0;
-        padding: 12px 15px;
-        font-size: 1em;
-        min-height: 50px;
+        /* FIX: Reduced padding and min-height to make individual tasks smaller. */
+        padding: 10px 12px;
+        font-size: 0.9em;
+        min-height: 40px;
     }
 
     /* Settings Page: Stack all controls for easy tapping */
