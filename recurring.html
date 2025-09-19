@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadence - Recurring Tasks</title>
+    <title>Cadence - Routine</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mobile.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
@@ -18,73 +18,58 @@
         <a href="settings.html" class="menu-item">Settings</a>
     </nav>
 
-    <div class="container">
-        <h1>Manage Routine</h1>
-        <div id="template-trash" class="dropzone">🗑️</div>
-
+    <div class="container" id="recurring-tasks-container">
         <div class="tabs">
-            <button class="tab-btn active" data-tab="my-tasks-panel">My Tasks</button>
-            <button class="tab-btn" data-tab="suggested-tasks-panel">Suggested</button>
+            <button class="tab-btn active" data-tab="my-tasks">My Tasks</button>
+            <button class="tab-btn" data-tab="suggested-tasks">Suggested</button>
+            <div id="template-trash" class="trash-zone">🗑️</div>
         </div>
 
-        <!-- My Tasks Panel (Default) -->
-        <div id="my-tasks-panel" class="tab-panel active">
-            <div class="add-task-wrapper">
-                <input type="text" id="new-recurring-task-input" placeholder="Create a new task...">
-                <button id="add-recurring-task-btn">+</button>
+        <!-- FIX: Wrap the two task panels in a new container for mobile layout. -->
+        <div id="task-source-panels">
+            <div id="my-tasks-panel" class="active">
+                <div class="add-task-wrapper">
+                    <input type="text" id="new-task-input" class="task-input" placeholder="Add a new recurring task...">
+                    <button id="add-task-btn" class="add-btn">+</button>
+                </div>
+                <div id="my-tasks-list" class="task-list">
+                    <!-- Draggable tasks will be populated here -->
+                </div>
             </div>
-            <div id="my-tasks-list" class="task-list dropzone">
-                <!-- User-created tasks will appear here -->
-            </div>
-        </div>
-
-        <!-- Suggested Tasks Panel -->
-        <div id="suggested-tasks-panel" class="tab-panel">
-            <div id="suggested-tasks-list" class="task-list dropzone">
-                <div class="task" draggable="true">Go for a walk</div>
-                <div class="task" draggable="true">Meal prep</div>
-                <div class="task" draggable="true">Clean the kitchen</div>
-                <div class="task" draggable="true">Drink a glass of water</div>
-                <div class="task" draggable="true">Stretch for 10 minutes</div>
-                <div class="task" draggable="true">Meditate for 5 minutes</div>
-                <div class="task" draggable="true">Plan your day</div>
-                <div class="task" draggable="true">Tidy up workspace</div>
-                <div class="task" draggable="true">Read a book</div>
-                <div class="task" draggable="true">Journal for 15 minutes</div>
-                <div class="task" draggable="true">Call a friend or family</div>
-                <div class="task" draggable="true">Prepare a healthy lunch</div>
-                <div class="task" draggable="true">Take vitamins</div>
-                <div class="task" draggable="true">Floss</div>
+            <div id="suggested-tasks-panel">
+                <div id="suggested-tasks-list" class="task-list">
+                    <!-- Suggested tasks will be populated here -->
+                </div>
             </div>
         </div>
 
         <div id="weekdays-container">
-            <!-- Weekday sections -->
-            <div class="weekday-section">
+            <!-- Day sections remain here -->
+            <div class="weekday-column" id="monday">
                 <h2>Monday</h2>
                 <div class="task-list dropzone" id="monday"></div>
             </div>
-            <div class="weekday-section">
+            <div class="weekday-column" id="tuesday">
                 <h2>Tuesday</h2>
                 <div class="task-list dropzone" id="tuesday"></div>
             </div>
-            <div class="weekday-section">
+            <div class="weekday-column" id="wednesday">
                 <h2>Wednesday</h2>
                 <div class="task-list dropzone" id="wednesday"></div>
             </div>
-            <div class="weekday-section">
+            <div class="weekday-column" id="thursday">
                 <h2>Thursday</h2>
                 <div class="task-list dropzone" id="thursday"></div>
             </div>
-            <div class="weekday-section">
+            <div class="weekday-column" id="friday">
                 <h2>Friday</h2>
                 <div class="task-list dropzone" id="friday"></div>
             </div>
-            <div class="weekday-section">
+            <div class="weekday-column" id="saturday">
                 <h2>Saturday</h2>
                 <div class="task-list dropzone" id="saturday"></div>
             </div>
-            <div class="weekday-section">
+            <div class="weekday-column" id="sunday">
                 <h2>Sunday</h2>
                 <div class="task-list dropzone" id="sunday"></div>
             </div>
