@@ -1,158 +1,140 @@
-/* --- Mobile-specific styles for screens 768px and narrower --- */
+/* ==========================================================================
+   Mobile-Friendly Stylesheet
+   - All styles are wrapped in a media query for screens 768px and narrower.
+   ========================================================================== */
 
-/* --- Global Mobile-Friendly Styles for screens 768px and narrower --- */
 @media (max-width: 768px) {
 
-    /* --- 1. Global Resets for a Native App Feel --- */
+    /* ======================================================================
+       1. Global Resets & Mobile Enhancements
+       ====================================================================== */
 
-    /* Universal box-sizing and tap highlight removal */
     * {
         -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS/Android */
     }
 
-    /* Prevent accidental text selection on UI elements */
-    .menu-btn, .tab-btn, .range-btn, button, .stat-item {
+    .menu-btn, .tab-btn, .range-btn, button, .stat-item, .task {
         -webkit-touch-callout: none; /* Disable callout sheet on long press */
         -webkit-user-select: none;   /* Disable text selection */
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
     }
 
-    /* Prevent iOS from auto-zooming on input fields */
-    input[type="text"],
-    input[type="password"],
-    input[type="email"],
-    input[type="number"],
-    input[type="search"],
-    input[type="tel"],
-    input[type="url"],
-    textarea,
-    select {
-        font-size: 16px; /* A font-size of 16px+ prevents auto-zoom */
+    input, textarea, select {
+        font-size: 16px !important; /* A font-size of 16px+ prevents iOS auto-zoom */
     }
 
-    /* General container padding for more breathing room */
     .container {
         padding: 15px;
     }
 
-    h1 {
-        font-size: 2em;
-    }
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.5em; }
 
-    h2 {
-        font-size: 1.5em;
-    }
+    /* ======================================================================
+       2. Page-Specific Layouts
+       ====================================================================== */
 
-
-    /* --- 2. Page-Specific Layouts --- */
-
-    /* Home Page: Stack the grid into a single column */
+    /* --- Home Page --- */
     .home-grid {
         grid-template-columns: 1fr;
         gap: 15px;
     }
 
-    /* Analytics Page: Wrap controls and make chart scrollable */
+    /* --- Analytics Page --- */
     .analytics-controls {
         flex-wrap: wrap;
         row-gap: 10px;
     }
-
     .chart-area {
         overflow-x: auto;
         justify-content: flex-start;
         padding-bottom: 10px;
     }
-
     .chart-bar-wrapper {
         flex: 0 0 35px;
     }
 
-    /* --- Recurring Page: NEW "Split-Screen" Mobile Layout --- */
-    
-    /* Main container becomes a side-by-side flexbox row */
+    /* --- Calendar Page --- */
+    .calendar-container {
+        flex-direction: column;
+    }
+    .calendar-grid {
+        flex-grow: 0;
+        margin-bottom: 15px;
+    }
+    .calendar-tasks {
+        flex-grow: 1;
+        max-height: none;
+    }
+
+    /* --- Recurring Tasks Page (NEW Split-Screen Layout) --- */
     #recurring-tasks-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 100px); /* Full height minus header/padding */
+    }
+    .tabs {
+        position: relative;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+    }
+    .split-view-wrapper {
         display: flex;
         flex-direction: row;
         gap: 10px;
-        /* Ensure it takes up all available height */
-        height: calc(100vh - 120px); /* Full viewport height minus header/padding */
+        flex-grow: 1;
+        overflow: hidden;
     }
-
-    /* Left column: Task source panels */
     #task-source-panels {
-        flex: 0 0 120px; /* Fixed width for the task list */
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto; /* Allow this column to scroll if content overflows */
+        flex: 0 0 120px;
+        overflow-y: auto;
+        padding-right: 5px;
     }
-
-    /* Right column: Weekday drop zones */
     #weekdays-container {
-        flex: 1; /* Takes up the rest of the width */
-        overflow-y: auto; /* Allows the days to scroll vertically */
-        padding-right: 5px; /* Space for scrollbar */
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 5px;
     }
-
-    /* Remove old panel styles and make them fit the new layout */
     #my-tasks-panel,
     #suggested-tasks-panel {
         display: none;
         padding: 0;
         background-color: transparent;
-        border-radius: 0;
-        margin-bottom: 0;
     }
-
     #my-tasks-panel.active,
     #suggested-tasks-panel.active {
         display: flex;
         flex-direction: column;
         gap: 10px;
     }
-
-    /* Task lists are now vertical */
     #my-tasks-list,
     #suggested-tasks-list {
         display: flex;
-        flex-direction: column; /* Stack tasks vertically */
+        flex-direction: column;
         gap: 8px;
-        min-height: auto;
-        padding: 0;
-        overflow-x: visible; /* Turn off horizontal scrolling */
     }
-
-    /* Individual tasks in the source list */
     #my-tasks-list .task,
     #suggested-tasks-list .task {
         font-size: 0.9em;
         padding: 10px 8px;
-        min-height: auto;
-        white-space: normal; /* Allow text to wrap */
+        white-space: normal;
         cursor: grab;
     }
-
-    /* The weekday columns now stack vertically */
     .weekday-column {
         margin-bottom: 10px;
     }
-
-    /* Trash can position adjustment */
     #template-trash {
-        top: -45px; /* Move it up next to the tabs */
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
         right: 0;
     }
 
-
-    /* Settings Page: Stack all controls for easy tapping */
+    /* --- Settings Page --- */
     .settings-section {
-        display: flex;
         flex-direction: column;
         gap: 15px;
     }
-
     .settings-section label,
     .settings-section .styled-select,
     .settings-section button,
@@ -160,14 +142,12 @@
         width: 100%;
         box-sizing: border-box;
     }
-
     .appearance-setting {
-        display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    /* Sustained Projects Page: Stack projects into a list */
+    /* --- Sustained Projects Page --- */
     .projects-container {
         grid-template-columns: 1fr;
         gap: 15px;
