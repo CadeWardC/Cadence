@@ -1230,6 +1230,29 @@ li label {
     }
 }
 
+/* FIX: Add a new media query specifically for mobile analytics layout fixes. */
+@media (max-width: 768px) {
+    .analytics-controls {
+        /* Allow the buttons to wrap onto the next line if they don't fit. */
+        flex-wrap: wrap;
+        /* Add a small gap between rows when they wrap. */
+        row-gap: 10px;
+    }
+
+    .chart-area {
+        /* Allow the chart to scroll horizontally if it has too many bars. */
+        overflow-x: auto;
+        /* Ensure the bars are aligned to the start, not spread out, when scrolling. */
+        justify-content: flex-start;
+        padding-bottom: 10px; /* Add space for the scrollbar */
+    }
+
+    .chart-bar-wrapper {
+        /* Give each bar a fixed width so they don't get squished. */
+        flex: 0 0 35px;
+    }
+}
+
 /* --- Daily Activity Chart Styles --- */
 .daily-activity-chart-container {
     background-color: rgba(255, 255, 255, 0.05);

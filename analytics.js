@@ -68,18 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
 
-        // --- DEFINITIVE FIX for Data Collection ---
-        // This unified logic correctly sums all task types for each day.
         const dailyCounts = {};
         let perfectRoutineDays = 0;
         let daysInPeriod = 0;
 
         // Pre-load all task data once to avoid repeated parsing in the loop
         const recurringTasksData = JSON.parse(localStorage.getItem('recurringTasks')) || {};
-        const uniqueTasks = JSON.parse(localStorage.getItem('uniqueTasks')) || {};
-        const deadlineTasks = JSON.parse(localStorage.getItem('deadlineTasks')) || {};
         // FIX: Load sustained tasks data.
         const sustainedTasks = JSON.parse(localStorage.getItem('sustainedTasks')) || {};
+        // REMOVED: No longer need to load the main unique/deadline lists here.
 
         let loopDate = new Date(startDate);
         while (loopDate <= endDate) {
@@ -91,21 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const completedRecurring = JSON.parse(localStorage.getItem(`completedRecurring-${dayKey}`)) || [];
             tasksCompletedOnThisDay += completedRecurring.length;
 
-            // 2. Count completed unique tasks for this day
-            Object.values(uniqueTasks).forEach(task => {
-                if (task.completed && task.completionDate === dayKey) {
+            // FIX: 2. Count completed unique and deadline tasks from the correct location.
+            // These tasks are moved to a 'calendarTasks-{dayKey}' item upon completion.
+            const calendarTasksOnThisDay = JSON.parse(localStorage.getItem(`calendarTasks-${dayKey}`)) || [];
+            calendarTasksOnThisDay.forEach(task => {
+                // FIX: Check for 'isDeadline' property instead of 'type'. This correctly excludes deadlines.
+                if (task.completed && !task.isDeadline) {
                     tasksCompletedOnThisDay++;
                 }
             });
 
-            // 3. Count completed deadline tasks for this day
-            Object.values(deadlineTasks).forEach(task => {
-                if (task.completed && task.completionDate === dayKey) {
-                    tasksCompletedOnThisDay++;
-                }
-            });
-
-            // FIX: 4. Count completed sustained tasks for this day.
+            // 3. Count completed sustained tasks for this day.
             Object.values(sustainedTasks).forEach(task => {
                 if (task.completed && task.completionDate === dayKey) {
                     tasksCompletedOnThisDay++;
@@ -129,25 +122,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Calculate totals from the accurate data
         const totalTasksCompleted = Object.values(dailyCounts).reduce((sum, count) => sum + count, 0);
+        
+        // FIX: Restore and correct the "Deadlines Met" calculation.
         let deadlinesMet = 0;
         let totalDeadlinesInPeriod = 0;
-        Object.values(deadlineTasks).forEach(task => {
+
+        // Find all deadlines (completed or not) that were DUE in the selected period.
+        const uncompletedDeadlines = JSON.parse(localStorage.getItem('deadlineTasks')) || {};
+        const deadlinesDueInPeriod = Object.values(uncompletedDeadlines).filter(task => {
             const dueDate = new Date(task.deadlineDateKey.replace(/-/g, '/'));
-            if (dueDate >= startDate && dueDate <= endDate) {
-                totalDeadlinesInPeriod++;
-                if (task.completed) {
-                    deadlinesMet++;
-                }
+            return dueDate >= startDate && dueDate <= endDate;
+        });
+
+        // Also find completed deadlines that were due in the period.
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('calendarTasks-')) {
+                const tasksOnDay = JSON.parse(localStorage.getItem(key));
+                tasksOnDay.forEach(task => {
+                    if (task.isDeadline && task.deadlineDateKey) {
+                        const dueDate = new Date(task.deadlineDateKey.replace(/-/g, '/'));
+                        if (dueDate >= startDate && dueDate <= endDate) {
+                            deadlinesDueInPeriod.push(task);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // From that list, count how many are completed.
+        deadlinesDueInPeriod.forEach(task => {
+            if (task.completed) {
+                deadlinesMet++;
             }
         });
+        totalDeadlinesInPeriod = deadlinesDueInPeriod.length;
+
 
         // --- Update UI ---
         document.getElementById('analytics-recurring-days').textContent = `${perfectRoutineDays}/${daysInPeriod}`;
-        document.getElementById('analytics-deadlines-met').textContent = `${deadlinesMet}`;
+        // FIX: Restore the UI update for the 'analytics-deadlines-met' element.
+        document.getElementById('analytics-deadlines-met').textContent = `${deadlinesMet}/${totalDeadlinesInPeriod}`;
         document.getElementById('analytics-total-tasks').textContent = totalTasksCompleted;
 
         setTimeout(() => {
             document.getElementById('recurring-bar').style.width = daysInPeriod > 0 ? `${(perfectRoutineDays / daysInPeriod) * 100}%` : '0%';
+            // FIX: Restore the UI update for the 'deadlines-bar'.
             document.getElementById('deadlines-bar').style.width = totalDeadlinesInPeriod > 0 ? `${(deadlinesMet / totalDeadlinesInPeriod) * 100}%` : '0%';
             const totalTaskGoal = daysInPeriod * 5;
             document.getElementById('total-tasks-bar').style.width = totalTaskGoal > 0 ? `${Math.min(100, (totalTasksCompleted / totalTaskGoal) * 100)}%` : '0%';
@@ -263,8 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('storage', (e) => {
         const key = e.key;
-        // FIX: Add 'sustainedTasks' to the condition to trigger updates.
-        if (key && (key.startsWith('completedRecurring-') || key === 'deadlineTasks' || key === 'uniqueTasks' || key === 'sustainedTasks')) {
+        // FIX: Listen for changes to all relevant task keys.
+        if (key && (key.startsWith('completedRecurring-') || key.startsWith('calendarTasks-') || key === 'sustainedTasks')) {
             const activeButton = document.querySelector('.range-btn.active');
             const currentRange = activeButton ? activeButton.dataset.range : 'weekly';
             updateAnalytics(currentRange);
