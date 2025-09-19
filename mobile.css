@@ -95,6 +95,12 @@
         gap: 15px;
     }
 
+    /* FIX: Add the missing rule to show the suggested tasks panel when it is active. */
+    #suggested-tasks-panel.active {
+        display: block;
+    }
+
+    /* Make the task lists horizontal and scrollable */
     #my-tasks-list,
     #suggested-tasks-list {
         display: flex;
