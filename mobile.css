@@ -1,45 +1,88 @@
 /* --- Mobile-specific styles for screens 768px and narrower --- */
 
-/* --- Analytics Page Mobile Styles --- */
+/* --- Global Mobile-Friendly Styles for screens 768px and narrower --- */
 @media (max-width: 768px) {
+
+    /* --- 1. Global Resets for a Native App Feel --- */
+
+    /* Universal box-sizing and tap highlight removal */
+    * {
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS/Android */
+    }
+
+    /* Prevent accidental text selection on UI elements */
+    .menu-btn, .tab-btn, .range-btn, button, .stat-item {
+        -webkit-touch-callout: none; /* Disable callout sheet on long press */
+        -webkit-user-select: none;   /* Disable text selection */
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    /* Prevent iOS from auto-zooming on input fields */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    select {
+        font-size: 16px; /* A font-size of 16px+ prevents auto-zoom */
+    }
+
+    /* General container padding for more breathing room */
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+
+    /* --- 2. Page-Specific Layouts --- */
+
+    /* Home Page: Stack the grid into a single column */
+    .home-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    /* Analytics Page: Wrap controls and make chart scrollable */
     .analytics-controls {
-        /* Allow the buttons to wrap onto the next line if they don't fit. */
         flex-wrap: wrap;
-        /* Add a small gap between rows when they wrap. */
         row-gap: 10px;
     }
 
     .chart-area {
-        /* Allow the chart to scroll horizontally if it has too many bars. */
         overflow-x: auto;
-        /* Ensure the bars are aligned to the start, not spread out, when scrolling. */
         justify-content: flex-start;
-        padding-bottom: 10px; /* Add space for the scrollbar */
+        padding-bottom: 10px;
     }
 
     .chart-bar-wrapper {
-        /* Give each bar a fixed width so they don't get squished. */
         flex: 0 0 35px;
     }
-}
 
-
-/* --- Recurring Page Mobile Styles --- */
-@media (max-width: 768px) {
-    /* Reposition the trash can for mobile layout */
+    /* Recurring Page: Horizontal scrolling task lists */
     #template-trash {
         position: absolute;
-        top: 105px; /* Align vertically with the tabs */
+        top: 105px;
         right: 15px;
-        width: 40px; /* Make it slightly smaller for mobile */
+        width: 40px;
         height: 40px;
         font-size: 20px;
     }
 
-    /* On mobile, the panels become containers for the horizontal lists */
     #my-tasks-panel,
     #suggested-tasks-panel {
-        display: none; /* Keep tab functionality */
+        display: none;
         padding: 15px;
         background-color: rgba(0,0,0,0.2);
         border-radius: 10px;
@@ -47,13 +90,11 @@
     }
 
     #my-tasks-panel.active {
-        /* Use a column layout to separate the input from the list */
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
-    /* Make the task lists horizontal and scrollable */
     #my-tasks-list,
     #suggested-tasks-list {
         display: flex;
@@ -64,10 +105,9 @@
         padding: 15px 0;
         overflow-x: auto;
         padding-bottom: 60px;
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* Style the scrollbar for a cleaner look */
     #my-tasks-list::-webkit-scrollbar,
     #suggested-tasks-list::-webkit-scrollbar {
         height: 8px;
@@ -79,14 +119,40 @@
         border-radius: 4px;
     }
 
-    /* Ensure tasks don't shrink or wrap */
     #my-tasks-list .task,
     #suggested-tasks-list .task {
         flex-shrink: 0;
         white-space: nowrap;
-        margin-bottom: 0; /* Override default margin */
+        margin-bottom: 0;
         padding: 12px 15px;
         font-size: 1em;
         min-height: 50px;
+    }
+
+    /* Settings Page: Stack all controls for easy tapping */
+    .settings-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .settings-section label,
+    .settings-section .styled-select,
+    .settings-section button,
+    .settings-section input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .appearance-setting {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Sustained Projects Page: Stack projects into a list */
+    .projects-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
 }
