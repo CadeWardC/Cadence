@@ -107,13 +107,12 @@
         display: flex;
         flex-direction: row;
         gap: 10px;
-        /* FIX: Significantly reduced min-height to shorten the container. */
-        min-height: 65px;
+        /* FIX: Removed the fixed min-height to allow the container to shrink when empty. */
+        min-height: auto;
         flex-grow: 1;
-        /* FIX: Reduced vertical padding. */
-        padding: 5px 0;
+        /* FIX: Adjusted padding to provide a small base height when empty, but allow it to grow. */
+        padding: 10px 0;
         overflow-x: auto;
-        /* FIX: Reduced bottom padding to reclaim more vertical space. */
         padding-bottom: 20px;
         -webkit-overflow-scrolling: touch;
     }
